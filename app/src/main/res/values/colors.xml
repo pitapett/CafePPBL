@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="cafe_navy">#021A54</color>
+    <color name="cafe_pink">#FF85BB</color>
+    <color name="cafe_light_pink">#FFCEE3</color>
+    <color name="cafe_bg_light">#F5F5F5</color>
+    <color name="white">#FFFFFF</color>
+</resources>

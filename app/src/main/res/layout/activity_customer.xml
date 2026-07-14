@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:weightSum="2"
+    android:background="@color/cafe_bg_light">
+
+    <Button
+        android:id="@+id/btnCallWaiter"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="8dp"
+        android:text="Call Waiter"
+        android:textColor="@color/white"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:backgroundTint="@color/cafe_navy" />
+
+    <Button
+        android:id="@+id/btnRequestBill"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:text="Request Bill"
+        android:textColor="@color/cafe_navy"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:backgroundTint="@color/cafe_pink" />
+
+</LinearLayout>

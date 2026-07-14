@@ -1,0 +1,60 @@
+package com.example.cafeapp.viewmodel
+
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.cafeapp.data.local.CafeDatabase
+import com.example.cafeapp.data.local.entity.MenuEntity
+import com.example.cafeapp.data.remote.RetrofitClient
+import com.example.cafeapp.data.repository.OrderRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+
+// We use AndroidViewModel instead of ViewModel because we need the Application context to open the Room Database
+class StaffMenuViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val repository: OrderRepository // <-- Change to OrderRepository
+
+    init {
+        val menuDao = CafeDatabase.getDatabase(application).menuDao()
+        val draftCartDao = CafeDatabase.getDatabase(application).draftCartDao()
+        repository = OrderRepository(RetrofitClient.api, menuDao, draftCartDao) // <-- Change to OrderRepository
+    }
+
+    // Convert the Room Flow into a StateFlow so the UI can easily observe it
+    val menuState = repository.getMenuStream().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Companion.WhileSubscribed(5000),
+        initialValue = emptyList<MenuEntity>()
+    )
+
+    fun syncMenuWithServer() {
+        viewModelScope.launch {
+            repository.syncMenu()
+        }
+    }
+
+    val liveCart = repository.getLiveCartStream()
+
+    fun addToCart(menuItem: MenuEntity) {
+        // Database writes MUST happen on the background (IO) thread
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.addToCart(menuItem)
+        }
+    }
+
+    private val _checkoutResult = MutableSharedFlow<Boolean>()
+    val checkoutResult = _checkoutResult.asSharedFlow()
+
+    // Change checkoutCart to accept the parameters
+    fun checkoutCart(tableNumber: String, staffId: String) {
+        viewModelScope.launch {
+            val success = repository.processCheckout(tableNumber, staffId)
+            _checkoutResult.emit(success)
+        }
+    }
+}
