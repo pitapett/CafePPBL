@@ -4,6 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.cafeapp.feature.setup.SetupScreen
+
+import com.example.cafeapp.feature.setup.SetupScreen
+import com.example.cafeapp.feature.admin.dashboard.AdminDashboardScreen
 
 @Composable
 fun CafeAppNavigation(startRole: String?) {
@@ -29,23 +33,7 @@ fun CafeAppNavigation(startRole: String?) {
             )
         }
 
-        // 2. Staff Dashboard
-        composable<StaffDashboardRoute> {
-            StaffDashboardScreen(
-                onNewOrderClicked = { tableNum -> navController.navigate(StaffMenuRoute(tableNum)) },
-                onActiveOrdersClicked = { navController.navigate(ActiveOrdersRoute) },
-                onTableStatusClicked = { navController.navigate(StaffTableStatusRoute) }
-            )
-        }
 
-        // 3. Staff Menu (Extracting the argument)
-        composable<StaffMenuRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<StaffMenuRoute>()
-            StaffMenuScreen(
-                tableNumber = route.tableNumber,
-                onViewDetailsClicked = { navController.navigate(CartDetailRoute(route.tableNumber)) }
-            )
-        }
 
         // ... Register all other routes here
     }

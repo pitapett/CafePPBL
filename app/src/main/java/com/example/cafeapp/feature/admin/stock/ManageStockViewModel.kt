@@ -1,9 +1,8 @@
-package com.example.cafeapp.viewmodel
+package com.example.cafeapp.feature.admin.stock
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.cafeapp.data.local.CafeDatabase
 import com.example.cafeapp.data.remote.RetrofitClient
 import com.example.cafeapp.data.remote.dto.StockRequest
 import com.example.cafeapp.data.remote.dto.StockResponse

@@ -1,4 +1,4 @@
-package com.example.cafeapp.viewmodel
+package com.example.cafeapp.feature.admin.tables
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -11,6 +11,7 @@ import com.example.cafeapp.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import retrofit2.Response
 
 class ManageTablesViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -57,7 +58,7 @@ class ManageTablesViewModel(application: Application) : AndroidViewModel(applica
     }
 
     // Abstracted helper to prevent boilerplate try/catch blocks
-    private fun executeTableAction(successMessage: String, apiCall: suspend () -> retrofit2.Response<*>) {
+    private fun executeTableAction(successMessage: String, apiCall: suspend () -> Response<*>) {
         viewModelScope.launch {
             _actionStatus.value = Resource.Loading()
             try {
