@@ -81,6 +81,8 @@ dependencies {
 
     // Jetpack Compose
     implementation("androidx.activity:activity-compose:1.9.0")
+    implementation("androidx.navigation:navigation-compose:2.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     implementation("androidx.compose.ui:ui:1.7.2")
     implementation("androidx.compose.ui:ui-tooling-preview:1.7.2")

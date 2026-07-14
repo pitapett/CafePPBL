@@ -1,5 +1,5 @@
 // ui/staff/StaffActivity.kt
-package com.example.cafeapp.ui.staff // Update package name
+package com.example.cafeapp.feature.staff // Update package name
 
     import android.content.Intent
     import android.os.Bundle
@@ -8,7 +8,6 @@ package com.example.cafeapp.ui.staff // Update package name
     import android.widget.Button
     import android.widget.LinearLayout
     import android.widget.TextView
-    import android.widget.Toast
     import androidx.activity.viewModels
     import androidx.appcompat.app.AppCompatActivity
     import androidx.lifecycle.Lifecycle

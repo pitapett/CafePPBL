@@ -27,14 +27,14 @@
         <activity
             android:name=".SetupActivity"
             android:exported="false" />
-        <activity android:name=".ui.staff.StaffActivity" />
-        <activity android:name=".ui.staff.StaffDashboardActivity" />
-        <activity android:name=".ui.staff.ActiveOrdersActivity" />
-        <activity android:name=".ui.staff.CartDetailActivity" />
-        <activity android:name=".ui.staff.StaffTableStatusActivity" />
-        <activity android:name=".ui.admin.AdminActivity" />
-        <activity android:name=".ui.admin.ManageStockActivity" />
-        <activity android:name=".ui.admin.ManageTablesActivity" />
+        <activity android:name=".feature.staff.StaffActivity" />
+        <activity android:name=".feature.staff.StaffDashboardActivity" />
+        <activity android:name=".feature.staff.ActiveOrdersActivity" />
+        <activity android:name=".feature.staff.CartDetailActivity" />
+        <activity android:name=".feature.staff.StaffTableStatusActivity" />
+        <activity android:name=".feature.admin.AdminActivity" />
+        <activity android:name=".feature.admin.ManageStockActivity" />
+        <activity android:name=".feature.admin.ManageTablesActivity" />
     </application>
 
 </manifest>

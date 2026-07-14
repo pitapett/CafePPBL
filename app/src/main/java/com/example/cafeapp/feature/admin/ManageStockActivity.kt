@@ -1,4 +1,4 @@
-package com.example.cafeapp.ui.admin
+package com.example.cafeapp.feature.admin
 
 import android.os.Bundle
 import android.text.InputType

@@ -1,4 +1,4 @@
-package com.example.cafeapp.ui.staff
+package com.example.cafeapp.feature.staff
 
 import android.os.Bundle
 import android.widget.Toast

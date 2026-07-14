@@ -1,4 +1,4 @@
-package com.example.cafeapp.ui.admin
+package com.example.cafeapp.feature.admin
 
 import android.view.LayoutInflater
 import android.view.View
