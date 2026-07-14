@@ -8,6 +8,8 @@ import com.example.cafeapp.feature.setup.SetupScreen
 
 import com.example.cafeapp.feature.setup.SetupScreen
 import com.example.cafeapp.feature.admin.dashboard.AdminDashboardScreen
+import com.example.cafeapp.feature.admin.stock.ManageStockScreen
+import com.example.cafeapp.feature.admin.tables.ManageTablesScreen
 
 @Composable
 fun CafeAppNavigation(startRole: String?) {
@@ -33,7 +35,55 @@ fun CafeAppNavigation(startRole: String?) {
             )
         }
 
+        // Inside your NavHost { ... }
 
+        composable<AdminDashboardRoute> {
+            AdminDashboardScreen(
+                onManageStockClicked = {
+                    // Navigate to Manage Stock (assuming you created the route object)
+                    navController.navigate(ManageStockRoute)
+                },
+                onManageTablesClicked = {
+                    // Navigate to Manage Tables
+                    navController.navigate(ManageTablesRoute)
+                },
+                onLogoutClicked = {
+                    // Clear the backstack and go back to Setup
+                    navController.navigate(SetupRoute) {
+                        popUpTo(0) { inclusive = true } // Clears navigation history
+                    }
+                }
+            )
+        }
+
+        composable<ManageStockRoute> {
+            ManageStockScreen(
+                onBackClicked = {
+                    // Pops this screen off the stack, returning to AdminDashboard
+                    navController.popBackStack()
+                },
+                onAddStockClicked = {
+                    // navController.navigate(AddEditStockRoute(itemId = null))
+                },
+                onEditItemClicked = { itemId ->
+                    // navController.navigate(AddEditStockRoute(itemId = itemId))
+                }
+            )
+        }
+
+        composable<ManageTablesRoute> {
+            ManageTablesScreen(
+                onBackClicked = {
+                    navController.popBackStack()
+                },
+                onAddTableClicked = {
+                    // navController.navigate(AddEditTableRoute)
+                },
+                onTableClicked = { tableId ->
+                    // navController.navigate(TableDetailRoute(tableId))
+                }
+            )
+        }
 
         // ... Register all other routes here
     }
