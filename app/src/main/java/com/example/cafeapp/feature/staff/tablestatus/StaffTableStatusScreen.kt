@@ -16,7 +16,7 @@ import com.example.cafeapp.utils.Resource
 import com.example.cafeapp.feature.staff.tablestatus.StaffTableViewModel
 import com.example.cafeapp.data.remote.dto.TableResponse
 
-class StaffTableStatusActivity : ComponentActivity() {
+class StaffTableStatusScreen : ComponentActivity() {
 
     private val viewModel: StaffTableViewModel by viewModels()
 
