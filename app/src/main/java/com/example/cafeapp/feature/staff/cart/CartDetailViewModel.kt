@@ -1,4 +1,4 @@
-package com.example.cafeapp.viewmodel
+package com.example.cafeapp.feature.staff.cart
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -9,7 +9,9 @@ import com.example.cafeapp.data.remote.RetrofitClient
 import com.example.cafeapp.data.repository.OrderRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class CartDetailViewModel(application: Application) : AndroidViewModel(application) {
@@ -17,12 +19,20 @@ class CartDetailViewModel(application: Application) : AndroidViewModel(applicati
     private val repository: OrderRepository // <-- Change to OrderRepository
 
     init {
-        val menuDao = CafeDatabase.getDatabase(application).menuDao()
-        val draftCartDao = CafeDatabase.getDatabase(application).draftCartDao()
-        repository = OrderRepository(RetrofitClient.api, menuDao, draftCartDao) // <-- Change to OrderRepository
+        val menuDao = CafeDatabase.Companion.getDatabase(application).menuDao()
+        val draftCartDao = CafeDatabase.Companion.getDatabase(application).draftCartDao()
+        repository = OrderRepository(
+            RetrofitClient.api,
+            menuDao,
+            draftCartDao
+        ) // <-- Change to OrderRepository
     }
 
-    val liveCart = repository.getLiveCartStream()
+    val liveCartState = repository.getLiveCartStream().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     private val _checkoutResult = MutableSharedFlow<Boolean>()
     val checkoutResult = _checkoutResult.asSharedFlow()

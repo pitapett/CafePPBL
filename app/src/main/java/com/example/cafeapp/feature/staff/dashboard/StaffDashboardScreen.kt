@@ -1,4 +1,4 @@
-package com.example.cafeapp.feature.staff
+package com.example.cafeapp.feature.staff.dashboard
 
 import android.content.Intent
 import android.os.Bundle
@@ -42,8 +42,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.cafeapp.viewmodel.ActiveOrdersViewModel
-import com.example.cafeapp.viewmodel.StaffTableViewModel
+import com.example.cafeapp.feature.staff.StaffActivity
+import com.example.cafeapp.feature.staff.tablestatus.StaffTableScreen
+import com.example.cafeapp.feature.staff.orders.ActiveOrdersScreen
+import com.example.cafeapp.feature.staff.orders.ActiveOrdersViewModel
+import com.example.cafeapp.feature.staff.tablestatus.StaffTableViewModel
 
 // Warna asli diambil persis dari colors.xml project (cafe_navy, cafe_pink)
 private val CafeNavy = Color(0xFF021A54)

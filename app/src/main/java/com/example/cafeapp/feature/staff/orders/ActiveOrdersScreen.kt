@@ -1,4 +1,4 @@
-package com.example.cafeapp.feature.staff
+package com.example.cafeapp.feature.staff.orders
 
 import android.os.Bundle
 import android.widget.Toast
@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.cafeapp.data.remote.dto.ProcessOrderResponse
 import com.example.cafeapp.utils.Resource
-import com.example.cafeapp.viewmodel.ActiveOrdersViewModel
+import com.example.cafeapp.feature.staff.orders.ActiveOrdersViewModel
 
 // Warna diambil persis dari item_active_order.xml (cafe_navy, cafe_pink dari colors.xml;
 // hijau #4CAF50 & putih hardcoded sama seperti di XML asli)

@@ -1,0 +1,121 @@
+package com.example.cafeapp.feature.staff.menu
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.cafeapp.data.local.entity.MenuEntity
+import com.example.cafeapp.feature.staff.menu.StaffMenuViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StaffMenuScreen(
+    tableNumber: String,
+    onBackClicked: () -> Unit,
+    onViewCartClicked: () -> Unit,
+    viewModel: StaffMenuViewModel = viewModel() // Inject your existing ViewModel
+) {
+    // Observe the states from your Room Database via the ViewModel
+    val menuItems by viewModel.menuState.collectAsState()
+    val cartItems by viewModel.liveCart.collectAsState()
+
+    // Trigger a background sync with the server when the screen opens
+    LaunchedEffect(Unit) {
+        viewModel.syncMenuWithServer()
+    }
+
+    // Dynamically calculate cart totals
+    val cartItemCount = cartItems.sumOf { it.quantity }
+    val cartTotal = cartItems.sumOf { it.price * it.quantity }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Table $tableNumber Menu") },
+                navigationIcon = {
+                    IconButton(onClick = onBackClicked) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back to Dashboard")
+                    }
+                }
+            )
+        },
+        floatingActionButton = {
+            if (cartItemCount > 0) {
+                ExtendedFloatingActionButton(
+                    onClick = onViewCartClicked,
+                    icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "View Cart") },
+                    text = {
+                        Text("View Cart ($cartItemCount) - $${String.format("%.2f", cartTotal)}")
+                    }
+                )
+            }
+        }
+    ) { paddingValues ->
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(bottom = 88.dp, top = 8.dp)
+        ) {
+            items(menuItems) { item ->
+                MenuItemCard(
+                    item = item,
+                    // Pass the actual MenuEntity straight to the ViewModel when clicked
+                    onAddClicked = { viewModel.addToCart(item) }
+                )
+            }
+        }
+    }
+}
+
+// 🧱 LOCAL COMPONENT
+@Composable
+private fun MenuItemCard(
+    item: MenuEntity, // Uses your Room Entity
+    onAddClicked: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = item.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // If your entity doesn't have a description, you can remove this block
+                item.description.let { desc ->
+                    Text(text = desc, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                Text(text = "Rp ${item.price.toInt()}", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+            }
+
+            IconButton(
+                onClick = onAddClicked,
+                modifier = Modifier.padding(start = 8.dp)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add ${item.name} to Cart")
+            }
+        }
+    }
+}

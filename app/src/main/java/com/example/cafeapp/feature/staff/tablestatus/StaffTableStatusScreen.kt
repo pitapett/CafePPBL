@@ -1,4 +1,4 @@
-package com.example.cafeapp.feature.staff
+package com.example.cafeapp.feature.staff.tablestatus
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.cafeapp.utils.Resource
-import com.example.cafeapp.viewmodel.StaffTableViewModel
+import com.example.cafeapp.feature.staff.tablestatus.StaffTableViewModel
 import com.example.cafeapp.data.remote.dto.TableResponse
 
 class StaffTableStatusActivity : ComponentActivity() {
