@@ -1,4 +1,4 @@
-package com.example.cafeapp.viewmodel
+package com.example.cafeapp.feature.staff.menu
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -14,15 +14,20 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+
 // We use AndroidViewModel instead of ViewModel because we need the Application context to open the Room Database
 class StaffMenuViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: OrderRepository // <-- Change to OrderRepository
 
     init {
-        val menuDao = CafeDatabase.getDatabase(application).menuDao()
-        val draftCartDao = CafeDatabase.getDatabase(application).draftCartDao()
-        repository = OrderRepository(RetrofitClient.api, menuDao, draftCartDao) // <-- Change to OrderRepository
+        val menuDao = CafeDatabase.Companion.getDatabase(application).menuDao()
+        val draftCartDao = CafeDatabase.Companion.getDatabase(application).draftCartDao()
+        repository = OrderRepository(
+            RetrofitClient.api,
+            menuDao,
+            draftCartDao
+        ) // <-- Change to OrderRepository
     }
 
     // Convert the Room Flow into a StateFlow so the UI can easily observe it
@@ -38,7 +43,11 @@ class StaffMenuViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    val liveCart = repository.getLiveCartStream()
+    val liveCart = repository.getLiveCartStream().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     fun addToCart(menuItem: MenuEntity) {
         // Database writes MUST happen on the background (IO) thread

@@ -1,4 +1,4 @@
-package com.example.cafeapp.viewmodel
+package com.example.cafeapp.feature.staff.tablestatus
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

@@ -7,9 +7,9 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cafeapp.feature.admin.AdminActivity
-import com.example.cafeapp.feature.staff.StaffDashboardActivity
+import com.example.cafeapp.feature.staff.dashboard.StaffDashboardActivity
 
-class RouterActivity : AppCompatActivity() {
+class outerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

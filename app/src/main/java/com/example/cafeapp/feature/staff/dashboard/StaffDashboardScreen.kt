@@ -1,35 +1,14 @@
-package com.example.cafeapp.feature.staff
+package com.example.cafeapp.feature.staff.dashboard
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.TableRestaurant
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,39 +21,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.cafeapp.viewmodel.ActiveOrdersViewModel
-import com.example.cafeapp.viewmodel.StaffTableViewModel
 
-// Warna asli diambil persis dari colors.xml project (cafe_navy, cafe_pink)
+// Import your screens and ViewModels
+import com.example.cafeapp.feature.staff.orders.ActiveOrdersScreen
+import com.example.cafeapp.feature.staff.orders.ActiveOrdersViewModel
+import com.example.cafeapp.feature.staff.tablestatus.StaffTableScreen
+import com.example.cafeapp.feature.staff.tablestatus.StaffTableStatusScreen
+import com.example.cafeapp.feature.staff.tablestatus.StaffTableViewModel
+
 private val CafeNavy = Color(0xFF021A54)
 private val CafePink = Color(0xFFFF85BB)
-
-/**
- * Pengganti StaffDashboardActivity versi 3-tombol sebelumnya.
- *
- * Sekarang jadi host untuk 2 tab via Bottom Navigation (Active Orders & Table Status)
- * plus FAB untuk aksi "New Order" -- sesuai arahan dosen untuk pakai komponen
- * navigasi Material Design (Bottom Navigation + FAB), bukan tombol biasa.
- *
- * "New Order" sengaja dijadikan FAB (bukan tab ketiga) karena sifatnya aksi
- * sesaat (munculin dialog input meja), bukan screen/section yang punya
- * konten untuk di-browse seperti 2 tab lainnya.
- */
-class StaffDashboardActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            StaffMainScreen(
-                onNewOrder = { tableNumber ->
-                    val intent = Intent(this, StaffActivity::class.java)
-                    intent.putExtra("EXTRA_TABLE_NUMBER", tableNumber)
-                    startActivity(intent)
-                },
-            )
-        }
-    }
-}
 
 private sealed class StaffTab(val route: String, val label: String) {
     data object ActiveOrders : StaffTab("active_orders", "Active Orders")
@@ -83,15 +39,28 @@ private sealed class StaffTab(val route: String, val label: String) {
 
 private val staffTabs = listOf(StaffTab.ActiveOrders, StaffTab.TableStatus)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StaffMainScreen(
-    onNewOrder: (tableNumber: String) -> Unit,
+fun StaffDashboardScreen(
+    onNewOrderClicked: (String) -> Unit,
+    onLogoutClicked: () -> Unit
 ) {
-    val navController = rememberNavController()
+    // This is a NESTED navController just for the Bottom Tabs
+    val bottomNavController = rememberNavController()
     var showTableInputDialog by remember { mutableStateOf(false) }
 
     Scaffold(
-        bottomBar = { StaffBottomBar(navController) },
+        topBar = {
+            TopAppBar(
+                title = { Text("Staff Dashboard") },
+                actions = {
+                    IconButton(onClick = onLogoutClicked) {
+                        Icon(Icons.Default.Logout, contentDescription = "Logout")
+                    }
+                }
+            )
+        },
+        bottomBar = { StaffBottomBar(bottomNavController) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showTableInputDialog = true },
@@ -100,26 +69,35 @@ fun StaffMainScreen(
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "New Order")
             }
-        },
+        }
     ) { innerPadding ->
+
+        // Nested NavHost for switching tabs without leaving the Dashboard
         NavHost(
-            navController = navController,
+            navController = bottomNavController,
             startDestination = StaffTab.ActiveOrders.route,
             modifier = Modifier.padding(innerPadding),
         ) {
             composable(StaffTab.ActiveOrders.route) {
                 val viewModel: ActiveOrdersViewModel = viewModel()
-                // fetchActiveOrders dipanggil sekali setiap kali tab ini pertama dibuka.
+
+                // Fetch data when the tab is opened (from your original code)
                 LaunchedEffect(Unit) {
                     viewModel.fetchActiveOrders()
                 }
+
+                // Call it exactly as your file expects it!
                 ActiveOrdersScreen(viewModel)
             }
             composable(StaffTab.TableStatus.route) {
                 val viewModel: StaffTableViewModel = viewModel()
+
+                // Fetch data when the tab is opened
                 LaunchedEffect(Unit) {
                     viewModel.fetchTables()
                 }
+
+                // Use your exact screen name and parameter!
                 StaffTableScreen(viewModel)
             }
         }
@@ -130,7 +108,7 @@ fun StaffMainScreen(
             onDismiss = { showTableInputDialog = false },
             onConfirm = { tableNumber ->
                 showTableInputDialog = false
-                onNewOrder(tableNumber)
+                onNewOrderClicked(tableNumber) // Sends the table # to main navigation
             },
         )
     }
@@ -149,7 +127,6 @@ private fun StaffBottomBar(navController: NavController) {
                 selected = selected,
                 onClick = {
                     navController.navigate(tab.route) {
-                        // Hindari numpuk banyak instance tab yang sama di back stack
                         popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true
                         }
@@ -177,11 +154,6 @@ private fun StaffBottomBar(navController: NavController) {
     }
 }
 
-/**
- * Pengganti showTableInputDialog() lama (AlertDialog.Builder + EditText).
- * Sama seperti sebelumnya -- dipindah ke sini karena sekarang FAB ada di level
- * StaffMainScreen, bukan lagi di salah satu "tombol" dashboard.
- */
 @Composable
 private fun TableInputDialog(
     onDismiss: () -> Unit,
@@ -231,6 +203,6 @@ private fun TableInputDialog(
             TextButton(onClick = onDismiss) {
                 Text("Cancel")
             }
-        },
+        }
     )
 }

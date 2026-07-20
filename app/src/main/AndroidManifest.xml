@@ -28,10 +28,10 @@
             android:name=".SetupActivity"
             android:exported="false" />
         <activity android:name=".feature.staff.StaffActivity" />
-        <activity android:name=".feature.staff.StaffDashboardActivity" />
-        <activity android:name=".feature.staff.ActiveOrdersActivity" />
+        <activity android:name=".feature.staff.dashboard.StaffDashboardActivity" />
+        <activity android:name=".feature.staff.orders.ActiveOrdersActivity" />
         <activity android:name=".feature.staff.CartDetailActivity" />
-        <activity android:name=".feature.staff.StaffTableStatusActivity" />
+        <activity android:name=".feature.staff.tablestatus.StaffTableStatusActivity" />
         <activity android:name=".feature.admin.AdminActivity" />
         <activity android:name=".feature.admin.ManageStockActivity" />
         <activity android:name=".feature.admin.ManageTablesActivity" />

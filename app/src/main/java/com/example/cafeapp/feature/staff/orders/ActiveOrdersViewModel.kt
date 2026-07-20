@@ -1,4 +1,4 @@
-package com.example.cafeapp.viewmodel
+package com.example.cafeapp.feature.staff.orders
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -16,9 +16,13 @@ class ActiveOrdersViewModel(application: Application) : AndroidViewModel(applica
     private val repository: OrderRepository // <-- Change to OrderRepository
 
     init {
-        val menuDao = CafeDatabase.getDatabase(application).menuDao()
-        val draftCartDao = CafeDatabase.getDatabase(application).draftCartDao()
-        repository = OrderRepository(RetrofitClient.api, menuDao, draftCartDao) // <-- Change to OrderRepository
+        val menuDao = CafeDatabase.Companion.getDatabase(application).menuDao()
+        val draftCartDao = CafeDatabase.Companion.getDatabase(application).draftCartDao()
+        repository = OrderRepository(
+            RetrofitClient.api,
+            menuDao,
+            draftCartDao
+        ) // <-- Change to OrderRepository
     }
 
     private val _orders = MutableStateFlow<Resource<List<ProcessOrderResponse>>>(Resource.Idle())

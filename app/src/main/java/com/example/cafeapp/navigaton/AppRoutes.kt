@@ -2,15 +2,18 @@ package com.example.cafeapp.navigaton
 
 import kotlinx.serialization.Serializable
 
-// Screens with no arguments
-@Serializable object SetupRoute
-@Serializable object AdminDashboardRoute
-@Serializable object ManageStockRoute
-@Serializable object ManageTablesRoute
-@Serializable object StaffDashboardRoute
-@Serializable object ActiveOrdersRoute
-@Serializable object StaffTableStatusRoute
+object AppRoutes {
+    @Serializable object SetupRoute
 
-// Screens that require arguments (Replaces intent.putExtra)
-@Serializable data class StaffMenuRoute(val tableNumber: String)
-@Serializable data class CartDetailRoute(val tableNumber: String)
+    // --- ADMIN ROUTES ---
+    @Serializable object AdminDashboardRoute
+    @Serializable object ManageStockRoute
+    @Serializable object ManageTablesRoute
+
+    // --- STAFF ROUTES ---
+    @Serializable object StaffDashboardRoute
+    @Serializable data class StaffMenuRoute(val tableNumber: String)
+    @Serializable data class CartDetailRoute(val tableNumber: String)
+    @Serializable object ActiveOrdersRoute
+    @Serializable object StaffTableStatusRoute
+}
