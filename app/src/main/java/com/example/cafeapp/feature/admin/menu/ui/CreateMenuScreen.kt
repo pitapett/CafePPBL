@@ -14,7 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun CreateMenuScreen(viewModel: MenuViewModel = viewModel()) {
+fun CreateMenuScreen(
+    onNavigateBack: () -> Unit,
+    viewModel: MenuViewModel = viewModel()) {
     val context = LocalContext.current
 
     // State untuk input field
@@ -50,9 +52,13 @@ fun CreateMenuScreen(viewModel: MenuViewModel = viewModel()) {
             enabled = !isLoading && imageUri != null,
             onClick = {
                 isLoading = true
-                viewModel.createMenu(context, name, price, "Makanan", "", description, imageUri!!) { success, message ->
+                viewModel.createMenu(context, name, price, "Main", "Coffee", description, imageUri!!) { success, message ->
                     isLoading = false
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+
+                    if (success) {
+                        onNavigateBack() // <--- Add this line to go back on success
+                    }
                 }
             }
         ) {

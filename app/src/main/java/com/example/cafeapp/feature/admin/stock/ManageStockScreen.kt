@@ -13,8 +13,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cafeapp.data.remote.dto.StockResponse
 import com.example.cafeapp.utils.Resource
@@ -22,29 +25,39 @@ import com.example.cafeapp.utils.Resource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageStockScreen(
+    onNavigateToCreate: () -> Unit,
     viewModel: ManageStockViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val stockState by viewModel.stockList.collectAsState()
     val actionStatus by viewModel.actionStatus.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     // Dialog State
     var showDialog by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<StockResponse?>(null) }
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchStock()
+    // Refresh data whenever the screen enters the RESUMED state (e.g., coming back from CreateMenu)
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.fetchStock()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
-    // Handle feedback from add/update/delete actions
     LaunchedEffect(actionStatus) {
         when (val status = actionStatus) {
             is Resource.Success -> {
-                Toast.makeText(context, status.data, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, status.data ?: "Success", Toast.LENGTH_SHORT).show()
                 viewModel.resetActionStatus()
             }
             is Resource.Error -> {
-                Toast.makeText(context, status.message, Toast.LENGTH_LONG).show()
+                Toast.makeText(context, status.message ?: "Error", Toast.LENGTH_LONG).show()
                 viewModel.resetActionStatus()
             }
             else -> {}
@@ -52,22 +65,18 @@ fun ManageStockScreen(
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Manage Stock") }) },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                selectedItem = null // Null means "Add New"
-                showDialog = true
-            }) {
-                Icon(Icons.Default.Add, contentDescription = "Add New Stock")
+            FloatingActionButton(onClick = onNavigateToCreate) {
+                Icon(Icons.Default.Add, contentDescription = "Add Menu")
             }
         }
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            when (stockState) {
+            when (val state = stockState) {
                 is Resource.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                is Resource.Error -> Text(text = stockState.message ?: "Error", color = MaterialTheme.colorScheme.error, modifier = Modifier.align(Alignment.Center))
+                is Resource.Error -> Text(text = state.message ?: "Error", color = MaterialTheme.colorScheme.error, modifier = Modifier.align(Alignment.Center))
                 is Resource.Success -> {
-                    val stockItems = stockState.data ?: emptyList()
+                    val stockItems = state.data ?: emptyList()
                     if (stockItems.isEmpty()) {
                         Text("No stock available.", modifier = Modifier.align(Alignment.Center))
                     } else {

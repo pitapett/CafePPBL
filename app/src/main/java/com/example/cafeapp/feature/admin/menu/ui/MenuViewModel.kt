@@ -42,7 +42,7 @@ class MenuViewModel : ViewModel() {
                 val file = File(context.cacheDir, "temp_image.jpg")
                 inputStream?.use { input -> file.outputStream().use { output -> input.copyTo(output) } }
 
-                val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+                val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
                 val imagePart = MultipartBody.Part.createFormData("image", file.name, requestFile)
 
                 // 3. Panggil API

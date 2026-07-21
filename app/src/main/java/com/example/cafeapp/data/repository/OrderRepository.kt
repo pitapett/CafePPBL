@@ -34,9 +34,10 @@ class OrderRepository(
                         category = networkItem.category,
                         price = networkItem.price.toDouble(),
                         description = networkItem.description,
-                        // ADD THESE NEW FIELDS:
-                        drinkCategory = networkItem.drink_category, // Adjust the name to match your API response
-                        image = networkItem.image // Adjust the name to match your API response
+
+                        // Use the property names as they appear in the data class, not the JSON
+                        drinkCategory = networkItem.drinkCategory,
+                        image = networkItem.image
                     )
                 }
                 menuDao.insertMenus(menuEntities)

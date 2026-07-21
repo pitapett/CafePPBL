@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.cafeapp.feature.admin.menu.ui.CreateMenuScreen
 import com.example.cafeapp.feature.admin.stock.ManageStockScreen
 import com.example.cafeapp.feature.admin.tables.ManageTablesScreen
 
@@ -56,10 +57,15 @@ fun AdminDashboardScreen(
             modifier = Modifier.padding(innerPadding),
         ) {
             composable(AdminTab.Stock.route) {
-                ManageStockScreen()
+                // Pass the navigation controller so ManageStockScreen can navigate to CreateMenu
+                ManageStockScreen(onNavigateToCreate = { navController.navigate("create_menu") })
             }
             composable(AdminTab.Tables.route) {
                 ManageTablesScreen()
+            }
+            // Add this new route
+            composable("create_menu") {
+                CreateMenuScreen(onNavigateBack = { navController.popBackStack() })
             }
         }
     }

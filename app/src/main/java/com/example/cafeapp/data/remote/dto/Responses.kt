@@ -18,8 +18,7 @@ data class MenuResponse(
     val category: String,
     @SerializedName("drink_category") val drinkCategory: String?,
     val description: String,
-    val drink_category: String?,
-    val image: String?
+    @SerializedName("image") val image: String?
 )
 
 data class BaseResponse(
