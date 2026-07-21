@@ -33,7 +33,10 @@ class OrderRepository(
                         name = networkItem.name,
                         category = networkItem.category,
                         price = networkItem.price.toDouble(),
-                        description = networkItem.description
+                        description = networkItem.description,
+                        // ADD THESE NEW FIELDS:
+                        drinkCategory = networkItem.drink_category, // Adjust the name to match your API response
+                        image = networkItem.image // Adjust the name to match your API response
                     )
                 }
                 menuDao.insertMenus(menuEntities)

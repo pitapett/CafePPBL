@@ -2,8 +2,8 @@ package com.example.cafeapp.feature.admin.dashboard
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Inventory
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.TableRestaurant
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -21,7 +21,7 @@ import com.example.cafeapp.feature.admin.stock.ManageStockScreen
 import com.example.cafeapp.feature.admin.tables.ManageTablesScreen
 
 private val CafeNavy = Color(0xFF021A54)
-private val CafePink = Color(0xFFFF85BB)
+private val CafePink = Color(0xFFFFFF85BB) // Assuming this is your pink color
 
 private sealed class AdminTab(val route: String, val label: String) {
     data object Stock : AdminTab("admin_stock", "Manage Stock")
@@ -30,6 +30,7 @@ private sealed class AdminTab(val route: String, val label: String) {
 
 private val adminTabs = listOf(AdminTab.Stock, AdminTab.Tables)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminDashboardScreen(
     onLogoutClicked: () -> Unit
@@ -37,16 +38,17 @@ fun AdminDashboardScreen(
     val navController = rememberNavController()
 
     Scaffold(
-        bottomBar = { AdminBottomBar(navController) },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onLogoutClicked,
-                containerColor = CafeNavy,
-                contentColor = Color.White,
-            ) {
-                Icon(Icons.Filled.ExitToApp, contentDescription = "Logout")
-            }
+        topBar = {
+            TopAppBar(
+                title = { Text("Admin Dashboard") },
+                actions = {
+                    IconButton(onClick = onLogoutClicked) {
+                        Icon(Icons.Default.Logout, contentDescription = "Logout")
+                    }
+                }
+            )
         },
+        bottomBar = { AdminBottomBar(navController) },
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -54,7 +56,6 @@ fun AdminDashboardScreen(
             modifier = Modifier.padding(innerPadding),
         ) {
             composable(AdminTab.Stock.route) {
-                // Instantiates the screen (Dialogs are handled internally now)
                 ManageStockScreen()
             }
             composable(AdminTab.Tables.route) {
