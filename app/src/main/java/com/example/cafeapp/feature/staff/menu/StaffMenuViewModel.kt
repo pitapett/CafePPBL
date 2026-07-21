@@ -56,6 +56,24 @@ class StaffMenuViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun decreaseFromCart(menuItem: MenuEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            // Find the item in the current cart state
+            val existingItem = liveCart.value.find { it.menuId == menuItem.id }
+
+            if (existingItem != null) {
+                if (existingItem.quantity > 1) {
+                    // Use .copy() to safely mutate the data class
+                    val updatedItem = existingItem.copy(quantity = existingItem.quantity - 1)
+                    repository.updateCartItem(updatedItem)
+                } else {
+                    // If quantity reaches 0, remove it entirely from the cart
+                    repository.deleteCartItem(existingItem)
+                }
+            }
+        }
+    }
+
     private val _checkoutResult = MutableSharedFlow<Boolean>()
     val checkoutResult = _checkoutResult.asSharedFlow()
 

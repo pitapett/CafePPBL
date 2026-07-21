@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,7 +16,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cafeapp.data.local.entity.MenuEntity
-import com.example.cafeapp.feature.staff.menu.StaffMenuViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,18 +23,15 @@ fun StaffMenuScreen(
     tableNumber: String,
     onBackClicked: () -> Unit,
     onViewCartClicked: () -> Unit,
-    viewModel: StaffMenuViewModel = viewModel() // Inject your existing ViewModel
+    viewModel: StaffMenuViewModel = viewModel()
 ) {
-    // Observe the states from your Room Database via the ViewModel
     val menuItems by viewModel.menuState.collectAsState()
     val cartItems by viewModel.liveCart.collectAsState()
 
-    // Trigger a background sync with the server when the screen opens
     LaunchedEffect(Unit) {
         viewModel.syncMenuWithServer()
     }
 
-    // Dynamically calculate cart totals
     val cartItemCount = cartItems.sumOf { it.quantity }
     val cartTotal = cartItems.sumOf { it.price * it.quantity }
 
@@ -55,13 +52,12 @@ fun StaffMenuScreen(
                     onClick = onViewCartClicked,
                     icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "View Cart") },
                     text = {
-                        Text("View Cart ($cartItemCount) - $${String.format("%.2f", cartTotal)}")
+                        Text("View Cart ($cartItemCount) - Rp ${cartTotal.toInt()}")
                     }
                 )
             }
         }
     ) { paddingValues ->
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -71,21 +67,27 @@ fun StaffMenuScreen(
             contentPadding = PaddingValues(bottom = 88.dp, top = 8.dp)
         ) {
             items(menuItems) { item ->
+                // Calculate the specific quantity for this item from the active cart state
+                val cartQuantity = cartItems.find { it.menuId == item.id }?.quantity ?: 0
+
                 MenuItemCard(
                     item = item,
-                    // Pass the actual MenuEntity straight to the ViewModel when clicked
-                    onAddClicked = { viewModel.addToCart(item) }
+                    cartQuantity = cartQuantity,
+                    onAddClicked = { viewModel.addToCart(item) },
+                    onDecreaseClicked = { viewModel.decreaseFromCart(item) }
                 )
             }
         }
     }
 }
 
-// 🧱 LOCAL COMPONENT
+// LOCAL COMPONENT
 @Composable
 private fun MenuItemCard(
-    item: MenuEntity, // Uses your Room Entity
-    onAddClicked: () -> Unit
+    item: MenuEntity,
+    cartQuantity: Int,
+    onAddClicked: () -> Unit,
+    onDecreaseClicked: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -101,20 +103,48 @@ private fun MenuItemCard(
                 Text(text = item.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // If your entity doesn't have a description, you can remove this block
                 item.description.let { desc ->
                     Text(text = desc, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
-
                 Text(text = "Rp ${item.price.toInt()}", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
             }
 
-            IconButton(
-                onClick = onAddClicked,
-                modifier = Modifier.padding(start = 8.dp)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add ${item.name} to Cart")
+            // Conditionally render the buttons based on the current cart quantity
+            if (cartQuantity > 0) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        onClick = onDecreaseClicked,
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Icon(Icons.Default.Remove, contentDescription = "Decrease ${item.name} quantity")
+                    }
+
+                    Text(
+                        text = cartQuantity.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+
+                    IconButton(
+                        onClick = onAddClicked,
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Increase ${item.name} quantity")
+                    }
+                }
+            } else {
+                IconButton(
+                    onClick = onAddClicked,
+                    modifier = Modifier.padding(start = 8.dp),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add ${item.name} to Cart")
+                }
             }
         }
     }
