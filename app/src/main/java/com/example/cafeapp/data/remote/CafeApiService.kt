@@ -3,8 +3,24 @@ package com.example.cafeapp.data.remote
 import com.example.cafeapp.data.remote.dto.*
 import retrofit2.Response
 import retrofit2.http.*
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.http.Multipart
+import retrofit2.http.POST
+import retrofit2.http.Part
 
 interface CafeApiService {
+
+    @Multipart
+    @POST("menu/create")
+    suspend fun createMenu(
+        @Part("name") name: RequestBody,
+        @Part("price") price: RequestBody,
+        @Part("category") category: RequestBody,
+        @Part("drink_category") drinkCategory: RequestBody?,
+        @Part("description") description: RequestBody,
+        @Part image: MultipartBody.Part
+    ): Response<MenuResponse>
 
     // ==========================================
     // ORDER ROUTES

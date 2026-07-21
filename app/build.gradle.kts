@@ -97,6 +97,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.6.0")
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
 
 configurations.all {
