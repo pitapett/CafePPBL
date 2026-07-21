@@ -1,5 +1,6 @@
 package com.example.cafeapp.feature.staff.cart
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,11 +13,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cafeapp.data.local.entity.DraftCartEntity
-import com.example.cafeapp.feature.staff.cart.CartDetailViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,25 +25,22 @@ fun CartDetailScreen(
     tableNumber: String,
     onBackClicked: () -> Unit,
     onCheckoutSuccess: () -> Unit,
-    viewModel: CartDetailViewModel = viewModel() // Inject your ViewModel
+    viewModel: CartDetailViewModel = viewModel()
 ) {
-    // Observe the Cart State from Room
+    val context = LocalContext.current
     val cartItems by viewModel.liveCartState.collectAsState()
-
-    // Local state to show the loading spinner on the button
     var isCheckingOut by remember { mutableStateOf(false) }
 
-    // Dynamic calculations
     val subtotal = cartItems.sumOf { it.price * it.quantity }
-    val tax = subtotal * 0.10 // Example: 10% tax. Remove if you don't use tax.
-    val total = subtotal + tax
 
-    // Listen for the successful network response
     LaunchedEffect(Unit) {
         viewModel.checkoutResult.collect { success ->
             isCheckingOut = false
             if (success) {
+                Toast.makeText(context, "Checkout successful", Toast.LENGTH_SHORT).show()
                 onCheckoutSuccess()
+            } else {
+                Toast.makeText(context, "Checkout failed. Please try again.", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -59,23 +57,25 @@ fun CartDetailScreen(
             )
         },
         bottomBar = {
-            // Only show the checkout bar if there are items in the cart
             if (cartItems.isNotEmpty()) {
                 CheckoutBottomBar(
-                    total = total,
+                    total = subtotal,
                     isCheckingOut = isCheckingOut,
                     onCheckoutClicked = {
                         isCheckingOut = true
-                        // Pass the actual logged-in Staff ID here
                         viewModel.checkoutCart(tableNumber, staffId = "STAFF_001")
                     }
                 )
             }
         }
     ) { paddingValues ->
-
         if (cartItems.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize().padding(paddingValues), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
                 Text("The cart is empty.", style = MaterialTheme.typography.bodyLarge)
             }
         } else {
@@ -87,12 +87,15 @@ fun CartDetailScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(top = 8.dp, bottom = 16.dp)
             ) {
-                items(cartItems) { item ->
+                items(cartItems, key = { it.cartId }) { item ->
                     CartItemCard(
                         item = item,
                         onIncreaseQty = { viewModel.updateQuantity(item, isIncrease = true) },
                         onDecreaseQty = { viewModel.updateQuantity(item, isIncrease = false) },
-                        onRemoveClicked = { viewModel.removeItem(item) }
+                        onRemoveClicked = { viewModel.removeItem(item) },
+                        onCustomizationChanged = { newNote ->
+                            viewModel.updateCustomization(item, newNote)
+                        }
                     )
                 }
             }
@@ -100,14 +103,16 @@ fun CartDetailScreen(
     }
 }
 
-// 🧱 LOCAL COMPONENT: The individual item in the cart
 @Composable
 private fun CartItemCard(
     item: DraftCartEntity,
     onIncreaseQty: () -> Unit,
     onDecreaseQty: () -> Unit,
-    onRemoveClicked: () -> Unit
+    onRemoveClicked: () -> Unit,
+    onCustomizationChanged: (String) -> Unit
 ) {
+    var noteText by remember(item.customization) { mutableStateOf(item.customization) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -118,29 +123,39 @@ private fun CartItemCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = item.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-
-                    // Show customization if it exists
-                    if (!item.customization.isNullOrBlank()) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = "Note: ${item.customization}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-                    }
+                    Text(
+                        text = item.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
                 Text(
-                    text = "Rp ${item.price.toInt() * item.quantity}",
+                    text = "Rp ${(item.price * item.quantity).toInt()}",
                     style = MaterialTheme.typography.titleMedium
                 )
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = noteText,
+                onValueChange = {
+                    noteText = it
+                    onCustomizationChanged(it)
+                },
+                label = { Text("Notes (e.g., Less ice, extra sugar)") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodyMedium
+            )
+
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Quantity Controls Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Delete Button
                 TextButton(
                     onClick = onRemoveClicked,
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
@@ -150,7 +165,6 @@ private fun CartItemCard(
                     Text("Remove")
                 }
 
-                // Plus/Minus Controls
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onDecreaseQty) {
                         Icon(Icons.Default.Remove, contentDescription = "Decrease")
@@ -169,7 +183,6 @@ private fun CartItemCard(
     }
 }
 
-// 🧱 LOCAL COMPONENT: The bottom sticky bar for totals
 @Composable
 private fun CheckoutBottomBar(
     total: Double,
@@ -198,10 +211,13 @@ private fun CheckoutBottomBar(
             Button(
                 onClick = onCheckoutClicked,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                enabled = !isCheckingOut // Disables while processing
+                enabled = !isCheckingOut
             ) {
                 if (isCheckingOut) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 } else {
                     Text("Confirm Checkout")
                 }

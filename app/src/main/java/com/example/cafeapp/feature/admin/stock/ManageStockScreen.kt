@@ -1,5 +1,6 @@
 package com.example.cafeapp.feature.admin.stock
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,7 +24,9 @@ import com.example.cafeapp.utils.Resource
 fun ManageStockScreen(
     viewModel: ManageStockViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     val stockState by viewModel.stockList.collectAsState()
+    val actionStatus by viewModel.actionStatus.collectAsState()
 
     // Dialog State
     var showDialog by remember { mutableStateOf(false) }
@@ -30,6 +34,21 @@ fun ManageStockScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchStock()
+    }
+
+    // Handle feedback from add/update/delete actions
+    LaunchedEffect(actionStatus) {
+        when (val status = actionStatus) {
+            is Resource.Success -> {
+                Toast.makeText(context, status.data, Toast.LENGTH_SHORT).show()
+                viewModel.resetActionStatus()
+            }
+            is Resource.Error -> {
+                Toast.makeText(context, status.message, Toast.LENGTH_LONG).show()
+                viewModel.resetActionStatus()
+            }
+            else -> {}
+        }
     }
 
     Scaffold(
@@ -82,12 +101,12 @@ fun ManageStockScreen(
                 if (selectedItem == null) {
                     viewModel.addStock(name, amount)
                 } else {
-                    viewModel.updateStock(selectedItem!!.id.toString(), name, amount)
+                    viewModel.updateStock(selectedItem!!.id, name, amount)
                 }
                 showDialog = false
             },
             onDelete = {
-                selectedItem?.let { viewModel.deleteStock(it.id.toString()) }
+                selectedItem?.let { viewModel.deleteStock(it.id) }
                 showDialog = false
             }
         )
@@ -103,7 +122,7 @@ private fun StockItemCard(item: StockResponse, onEditClicked: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(text = item.ingredient_name ?: "Unknown", style = MaterialTheme.typography.titleMedium)
+                Text(text = item.ingredient_name, style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = "Qty: ${item.amount}", style = MaterialTheme.typography.bodyMedium)
             }

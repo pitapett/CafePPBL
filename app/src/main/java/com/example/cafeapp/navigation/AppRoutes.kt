@@ -3,17 +3,23 @@ package com.example.cafeapp.navigation
 import kotlinx.serialization.Serializable
 
 object AppRoutes {
-    @Serializable object SetupRoute
+
+    @Serializable
+    object SplashRoute
+    @Serializable
+    object SetupRoute
 
     // --- ADMIN ROUTES ---
-    @Serializable object AdminDashboardRoute
-    @Serializable object ManageStockRoute
-    @Serializable object ManageTablesRoute
+    @Serializable
+    object AdminDashboardRoute
 
     // --- STAFF ROUTES ---
-    @Serializable object StaffDashboardRoute
-    @Serializable data class StaffMenuRoute(val tableNumber: String)
-    @Serializable data class CartDetailRoute(val tableNumber: String)
-    @Serializable object ActiveOrdersRoute
-    @Serializable object StaffTableStatusRoute
+    @Serializable
+    object StaffDashboardRoute
+
+    @Serializable
+    data class StaffMenuRoute(val tableNumber: String)
+
+    @Serializable
+    data class CartDetailRoute(val tableNumber: String)
 }

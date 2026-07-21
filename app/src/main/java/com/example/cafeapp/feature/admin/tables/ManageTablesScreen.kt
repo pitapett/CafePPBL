@@ -1,5 +1,6 @@
 package com.example.cafeapp.feature.admin.tables
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -12,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -24,7 +26,9 @@ import com.example.cafeapp.utils.Resource
 fun ManageTablesScreen(
     viewModel: ManageTablesViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     val tableState by viewModel.tables.collectAsState()
+    val actionStatus by viewModel.actionStatus.collectAsState()
 
     // Dialog State
     var showDialog by remember { mutableStateOf(false) }
@@ -32,6 +36,21 @@ fun ManageTablesScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchTables()
+    }
+
+    // Handle feedback from add/update/delete actions
+    LaunchedEffect(actionStatus) {
+        when (val status = actionStatus) {
+            is Resource.Success -> {
+                Toast.makeText(context, status.data, Toast.LENGTH_SHORT).show()
+                viewModel.resetActionStatus()
+            }
+            is Resource.Error -> {
+                Toast.makeText(context, status.message, Toast.LENGTH_LONG).show()
+                viewModel.resetActionStatus()
+            }
+            else -> {}
+        }
     }
 
     Scaffold(
@@ -86,12 +105,12 @@ fun ManageTablesScreen(
                 if (selectedItem == null) {
                     viewModel.addTable(number, area)
                 } else {
-                    viewModel.updateTable(selectedItem!!.id.toString(), number, area)
+                    viewModel.updateTable(selectedItem!!.id, number, area)
                 }
                 showDialog = false
             },
             onDelete = {
-                selectedItem?.let { viewModel.deleteTable(it.id.toString()) }
+                selectedItem?.let { viewModel.deleteTable(it.id) }
                 showDialog = false
             }
         )
@@ -101,7 +120,7 @@ fun ManageTablesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TableGridCard(table: TableResponse, onClick: () -> Unit) {
-    val statusColor = when (table.status?.uppercase()) {
+    val statusColor = when (table.status.uppercase()) {
         "AVAILABLE" -> Color(0xFF4CAF50)
         "OCCUPIED" -> Color(0xFFF44336)
         "CLEANING" -> Color(0xFFFF9800)
@@ -121,10 +140,10 @@ private fun TableGridCard(table: TableResponse, onClick: () -> Unit) {
         ) {
             Text(text = "Table ${table.tableNumber}", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Area: ${table.area ?: "Main"}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Area: ${table.area}", style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(16.dp))
             Surface(color = statusColor.copy(alpha = 0.2f), shape = MaterialTheme.shapes.small) {
-                Text(text = table.status ?: "UNKNOWN", color = statusColor, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+                Text(text = table.status, color = statusColor, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
             }
         }
     }
