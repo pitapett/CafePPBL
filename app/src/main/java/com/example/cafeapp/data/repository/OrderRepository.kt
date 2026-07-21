@@ -6,6 +6,7 @@ import com.example.cafeapp.data.local.dao.MenuDao
 import com.example.cafeapp.data.local.entity.DraftCartEntity
 import com.example.cafeapp.data.local.entity.MenuEntity
 import com.example.cafeapp.data.remote.CafeApiService
+import com.example.cafeapp.data.remote.dto.CreateOrderRequest
 import com.example.cafeapp.data.remote.dto.OrderItemRequest
 import com.example.cafeapp.data.remote.dto.PaymentRequest
 import kotlinx.coroutines.flow.Flow
@@ -76,33 +77,39 @@ class OrderRepository(
     }
 
     // --- CHECKOUT & ORDER LOGIC ---
+    // In OrderRepository.kt
+    // In OrderRepository.kt
     suspend fun processCheckout(tableNumber: String, staffId: String): Boolean {
         try {
             val localItems = draftCartDao.getCartItemsList()
             if (localItems.isEmpty()) return false
 
+            // Map local cart items directly to the JSON Array format the server expects
             val networkPayload = localItems.map { item ->
                 OrderItemRequest(
                     menuId = item.menuId,
                     quantity = item.quantity,
                     price = item.price,
                     tableId = tableNumber,
-                    userId = "2ef63ed0-aaed-4035-9970-86d344ce20e7", // hard coded userId that has staff role
+                    userId = staffId, // The dynamic staff ID is preserved here
                     customization = item.customization
                 )
             }
 
+            // Send the raw list directly to the API
             val response = apiService.createOrder(networkPayload)
+
             if (response.isSuccessful && response.body()?.success == true) {
                 draftCartDao.clearCart()
                 return true
+            } else {
+                Log.e("CafeCheckout", "Server rejected order: ${response.errorBody()?.string()}")
             }
         } catch (e: Exception) {
             Log.e("CafeCheckout", "Failed to reach server: ${e.message}")
         }
         return false
     }
-
     suspend fun getProcessOrders() = apiService.getProcessOrders()
 
     suspend fun processPayment(orderId: String, method: String) = apiService.payOrder(
