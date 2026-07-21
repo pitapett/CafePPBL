@@ -1,4 +1,4 @@
-package com.example.cafeapp.navigaton
+package com.example.cafeapp.navigation
 
 import kotlinx.serialization.Serializable
 

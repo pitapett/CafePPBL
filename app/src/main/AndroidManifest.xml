@@ -12,29 +12,30 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CafeApp"
         android:usesCleartextTraffic="true">
+<!--        <activity-->
+<!--            android:name=".SplashActivity"-->
+<!--            android:exported="true">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
+<!--        <activity-->
+<!--            android:name=".RouterActivity"-->
+<!--            android:exported="false" />-->
+<!--        <activity-->
+<!--            android:name=".SetupActivity"-->
+<!--            android:exported="false" />-->
+<!--        <activity android:name=".feature.staff.orders.ActiveOrdersActivity" />-->
         <activity
-            android:name=".SplashActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".RouterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SetupActivity"
-            android:exported="false" />
-        <activity android:name=".feature.staff.StaffActivity" />
-        <activity android:name=".feature.staff.dashboard.StaffDashboardActivity" />
-        <activity android:name=".feature.staff.orders.ActiveOrdersActivity" />
-        <activity android:name=".feature.staff.CartDetailActivity" />
-        <activity android:name=".feature.staff.tablestatus.StaffTableStatusActivity" />
-        <activity android:name=".feature.admin.AdminActivity" />
-        <activity android:name=".feature.admin.ManageStockActivity" />
-        <activity android:name=".feature.admin.ManageTablesActivity" />
     </application>
 
 </manifest>
