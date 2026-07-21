@@ -57,6 +57,9 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    // Compose UI Testing
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Lifecycle & MVVM
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
@@ -97,6 +100,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.6.0")
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // testing
+
 }
 
 configurations.all {
