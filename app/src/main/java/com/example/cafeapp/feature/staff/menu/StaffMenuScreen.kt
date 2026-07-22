@@ -1,6 +1,9 @@
 package com.example.cafeapp.feature.staff.menu
 
 import androidx.compose.foundation.layout.*
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -16,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cafeapp.data.local.entity.MenuEntity
 import com.example.cafeapp.feature.staff.menu.StaffMenuViewModel
-
+private const val IMAGE_BASE_URL = "http://10.0.2.2:3000/uploads/"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StaffMenuScreen(
@@ -25,6 +28,10 @@ fun StaffMenuScreen(
     onViewCartClicked: () -> Unit,
     viewModel: StaffMenuViewModel = viewModel() // Inject your existing ViewModel
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.syncMenuWithServer()
+    }
+
     // Observe the states from your Room Database via the ViewModel
     val menuItems by viewModel.menuState.collectAsState()
     val cartItems by viewModel.liveCart.collectAsState()
@@ -97,24 +104,51 @@ private fun MenuItemCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = item.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+
+            AsyncImage(
+                model = item.image?.let { IMAGE_BASE_URL + it },
+                contentDescription = item.name,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(MaterialTheme.shapes.medium),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = item.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // If your entity doesn't have a description, you can remove this block
-                item.description.let { desc ->
-                    Text(text = desc, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+                Text(
+                    text = item.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
-                Text(text = "Rp ${item.price.toInt()}", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Rp ${item.price.toInt()}",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
 
             IconButton(
-                onClick = onAddClicked,
-                modifier = Modifier.padding(start = 8.dp)
+                onClick = onAddClicked
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add ${item.name} to Cart")
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = "Add ${item.name}"
+                )
             }
         }
     }
