@@ -20,8 +20,7 @@ class CreateMenuScreenTest {
         // 3. setContent is now safely called against the instantiated rule
         composeTestRule.setContent {
             CreateMenuScreen(
-                onNavigateBack = {},
-                viewModel = MenuViewModel()
+                onNavigateBack = {}
             )
         }
 

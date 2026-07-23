@@ -26,7 +26,7 @@ class CheckoutBottomBarTest {
         }
 
         // Verify the total is formatted and displayed correctly
-        composeTestRule.onNodeWithText("Rp 75000").assertExists()
+        composeTestRule.onNodeWithText("Rp 75.000", substring = true).assertExists()
 
         // Click the confirm button
         composeTestRule.onNodeWithText("Confirm Checkout").performClick()

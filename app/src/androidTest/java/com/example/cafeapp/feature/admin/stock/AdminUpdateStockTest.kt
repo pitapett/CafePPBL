@@ -7,6 +7,7 @@ import com.example.cafeapp.data.remote.dto.StockResponse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.Assert.assertEquals
 
 @RunWith(AndroidJUnit4::class)
 class StockDialogTest {
@@ -19,12 +20,7 @@ class StockDialogTest {
         var savedName = ""
         var savedAmount = 0
 
-        // Create a dummy item to trigger edit mode
-        val existingStock = StockResponse(
-            id = "1",
-            ingredient_name = "Milk",
-            amount = 10
-        )
+        val existingStock = StockResponse(id = "1", ingredient_name = "Milk", amount = 10)
 
         composeTestRule.setContent {
             StockDialog(
@@ -38,22 +34,19 @@ class StockDialogTest {
             )
         }
 
-        // Verify it is in Edit mode
         composeTestRule.onNodeWithText("Edit Stock").assertExists()
 
-        // The fields should be prepopulated with the existing data
-        composeTestRule.onNodeWithText("Milk").assertExists()
-        composeTestRule.onNodeWithText("10").assertExists()
-
-        // Clear the old amount and enter a new one
-        composeTestRule.onNodeWithText("10").performTextClearance()
-        composeTestRule.onNodeWithText("Quantity").performTextInput("50")
+        // Cari berdasarkan label TextField-nya, lalu ganti teksnya
+        composeTestRule.onNodeWithText("Quantity")
+            .performTextClearance()
+        composeTestRule.onNodeWithText("Quantity")
+            .performTextInput("50")
 
         // Trigger save
         composeTestRule.onNodeWithText("Save").performClick()
 
-        // Assert the callback received the updated payload
-        assert(savedName == "Milk")
-        assert(savedAmount == 50)
+        // Pakai assertEquals dari JUnit
+        assertEquals("Milk", savedName)
+        assertEquals(50, savedAmount)
     }
 }
