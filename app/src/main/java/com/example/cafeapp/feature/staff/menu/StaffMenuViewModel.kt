@@ -16,21 +16,15 @@ import kotlinx.coroutines.launch
 
 
 // We use AndroidViewModel instead of ViewModel because we need the Application context to open the Room Database
-class StaffMenuViewModel(application: Application) : AndroidViewModel(application) {
+class StaffMenuViewModel(
+    application: Application,
+    private val repository: OrderRepository = OrderRepository(
+        RetrofitClient.api,
+        CafeDatabase.getDatabase(application).menuDao(),
+        CafeDatabase.getDatabase(application).draftCartDao()
+    )
+) : AndroidViewModel(application) {
 
-    private val repository: OrderRepository // <-- Change to OrderRepository
-
-    init {
-        val menuDao = CafeDatabase.Companion.getDatabase(application).menuDao()
-        val draftCartDao = CafeDatabase.Companion.getDatabase(application).draftCartDao()
-        repository = OrderRepository(
-            RetrofitClient.api,
-            menuDao,
-            draftCartDao
-        ) // <-- Change to OrderRepository
-    }
-
-    // Convert the Room Flow into a StateFlow so the UI can easily observe it
     val menuState = repository.getMenuStream().stateIn(
         scope = viewModelScope,
         started = SharingStarted.Companion.WhileSubscribed(5000),
