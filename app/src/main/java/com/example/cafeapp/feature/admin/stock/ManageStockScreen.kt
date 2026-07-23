@@ -123,7 +123,7 @@ fun ManageStockScreen(
 }
 
 @Composable
-private fun StockItemCard(item: StockResponse, onEditClicked: () -> Unit) {
+fun StockItemCard(item: StockResponse, onEditClicked: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -143,7 +143,7 @@ private fun StockItemCard(item: StockResponse, onEditClicked: () -> Unit) {
 }
 
 @Composable
-private fun StockDialog(
+fun StockDialog(
     item: StockResponse?,
     onDismiss: () -> Unit,
     onSave: (String, Int) -> Unit,

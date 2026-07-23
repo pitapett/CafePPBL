@@ -89,7 +89,7 @@ fun ActiveOrdersScreen(viewModel: ActiveOrdersViewModel) {
 }
 
 @Composable
-private fun PaymentMethodDialog(
+fun PaymentMethodDialog(
     onDismiss: () -> Unit,
     onMethodSelected: (String) -> Unit
 ) {
@@ -141,7 +141,7 @@ fun ActiveOrdersList(
 }
 
 @Composable
-private fun ActiveOrderItem(
+fun ActiveOrderItem(
     order: ProcessOrderResponse,
     onPayClicked: () -> Unit
 ) {

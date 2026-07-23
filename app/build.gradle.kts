@@ -58,6 +58,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+
     // Lifecycle & MVVM
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
@@ -100,6 +103,7 @@ dependencies {
 
     implementation("androidx.activity:activity-compose:1.8.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
 }
 
 configurations.all {
