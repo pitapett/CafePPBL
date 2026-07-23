@@ -101,6 +101,14 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.8.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("io.coil-kt:coil-compose:2.7.0")
+
+    testImplementation("junit:junit:4.13.2")
+
+    testImplementation("io.mockk:mockk:1.13.12")
+
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
 }
 
 configurations.all {
