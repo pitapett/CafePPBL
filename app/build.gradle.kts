@@ -54,12 +54,21 @@ dependencies {
     implementation(libs.material)
 
     implementation(libs.androidx.constraintlayout)
+
+    // --- TESTING DEPENDENCIES ---
+    // Unit Test (app/src/test)
     testImplementation(libs.junit)
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+    // UI Test / Instrumented Test (app/src/androidTest)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    // ⚠️ PERBAIKAN DI SINI: Ditambahkan versi :1.7.2
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.2")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.2")
 
     // Lifecycle & MVVM
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
@@ -71,20 +80,18 @@ dependencies {
     // Retrofit & Network
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0") // Useful for debugging API calls
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-    // Room Database (We will implement this later for the Staff role)
+    // Room Database
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
-
     ksp("androidx.room:room-compiler:$room_version")
 
     // Jetpack Compose
-    implementation("androidx.activity:activity-compose:1.9.0")
     implementation("androidx.navigation:navigation-compose:2.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
@@ -96,14 +103,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
 
-    implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.compose.material:material-icons-extended:1.6.0")
-
     implementation("androidx.datastore:datastore-preferences:1.1.1")
-
-    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.activity:activity-compose:1.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-
 }
 
 configurations.all {
