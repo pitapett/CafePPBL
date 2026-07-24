@@ -12,14 +12,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ManageStockViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository: StockRepository
-    init {
-        // Stock doesn't need Room databases anymore!
-        repository = StockRepository(RetrofitClient.api)
-    }
-
+class ManageStockViewModel(
+    application: Application,
+    private val repository: StockRepository = StockRepository(RetrofitClient.api)
+) : AndroidViewModel(application) {
     private val _stockList = MutableStateFlow<Resource<List<StockResponse>>>(Resource.Idle())
     val stockList: StateFlow<Resource<List<StockResponse>>> = _stockList
 

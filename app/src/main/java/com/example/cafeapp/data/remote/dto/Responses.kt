@@ -16,8 +16,14 @@ data class MenuResponse(
     val name: String,
     val price: Double,
     val category: String,
-    @SerializedName("drink_category") val drinkCategory: String?,
-    val description: String
+
+    @SerializedName("drink_category")
+    val drinkCategory: String?,
+
+    val description: String,
+
+    @SerializedName("image")
+    val image: String?
 )
 
 data class BaseResponse(

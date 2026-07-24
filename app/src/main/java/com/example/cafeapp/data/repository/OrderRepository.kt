@@ -6,7 +6,6 @@ import com.example.cafeapp.data.local.dao.MenuDao
 import com.example.cafeapp.data.local.entity.DraftCartEntity
 import com.example.cafeapp.data.local.entity.MenuEntity
 import com.example.cafeapp.data.remote.CafeApiService
-import com.example.cafeapp.data.remote.dto.CreateOrderRequest
 import com.example.cafeapp.data.remote.dto.OrderItemRequest
 import com.example.cafeapp.data.remote.dto.PaymentRequest
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +23,7 @@ class OrderRepository(
 
     suspend fun syncMenu() {
         try {
-            val response = apiService.getAllMenu()
+            val response = apiService.getAllOfMenu() // endpoint /menu/all (sudah filter deletedAt null)
             if (response.isSuccessful && response.body() != null) {
                 val networkMenus = response.body()!!
                 val menuEntities = networkMenus.map { networkItem ->
@@ -33,14 +32,20 @@ class OrderRepository(
                         name = networkItem.name,
                         category = networkItem.category,
                         price = networkItem.price.toDouble(),
-                        description = networkItem.description
+                        description = networkItem.description,
+                        drinkCategory = networkItem.drinkCategory,
+                        image = networkItem.image
                     )
                 }
+                // Hapus semua data lama dulu, baru insert yang baru
+                menuDao.clearMenus() // <-- perbaiki di sini
                 menuDao.insertMenus(menuEntities)
-                Log.d("CafeSync", "Successfully saved to Room!")
+                Log.d("CafeSync", "Successfully synced ${menuEntities.size} menus to Room!")
+            } else {
+                Log.e("CafeSync", "API response not successful: ${response.code()}")
             }
         } catch (e: Exception) {
-            Log.e("CafeSync", "Network request completely failed: ${e.message}")
+            Log.e("CafeSync", "Network request failed: ${e.message}")
         }
     }
 
@@ -77,26 +82,22 @@ class OrderRepository(
     }
 
     // --- CHECKOUT & ORDER LOGIC ---
-    // In OrderRepository.kt
-    // In OrderRepository.kt
     suspend fun processCheckout(tableNumber: String, staffId: String): Boolean {
         try {
             val localItems = draftCartDao.getCartItemsList()
             if (localItems.isEmpty()) return false
 
-            // Map local cart items directly to the JSON Array format the server expects
             val networkPayload = localItems.map { item ->
                 OrderItemRequest(
                     menuId = item.menuId,
                     quantity = item.quantity,
                     price = item.price,
                     tableId = tableNumber,
-                    userId = staffId, // The dynamic staff ID is preserved here
+                    userId = staffId,
                     customization = item.customization
                 )
             }
 
-            // Send the raw list directly to the API
             val response = apiService.createOrder(networkPayload)
 
             if (response.isSuccessful && response.body()?.success == true) {
@@ -110,6 +111,7 @@ class OrderRepository(
         }
         return false
     }
+
     suspend fun getProcessOrders() = apiService.getProcessOrders()
 
     suspend fun processPayment(orderId: String, method: String) = apiService.payOrder(

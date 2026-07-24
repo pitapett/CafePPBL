@@ -14,20 +14,14 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class CartDetailViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository: OrderRepository // <-- Change to OrderRepository
-
-    init {
-        val menuDao = CafeDatabase.Companion.getDatabase(application).menuDao()
-        val draftCartDao = CafeDatabase.Companion.getDatabase(application).draftCartDao()
-        repository = OrderRepository(
-            RetrofitClient.api,
-            menuDao,
-            draftCartDao
-        ) // <-- Change to OrderRepository
-    }
-
+class CartDetailViewModel(
+    application: Application,
+    private val repository: OrderRepository = OrderRepository(
+        RetrofitClient.api,
+        CafeDatabase.getDatabase(application).menuDao(),
+        CafeDatabase.getDatabase(application).draftCartDao()
+    )
+) : AndroidViewModel(application) {
     val liveCartState = repository.getLiveCartStream().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
