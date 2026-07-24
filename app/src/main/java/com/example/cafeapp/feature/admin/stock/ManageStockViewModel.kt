@@ -1,7 +1,6 @@
 package com.example.cafeapp.feature.admin.stock
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cafeapp.data.remote.RetrofitClient
 import com.example.cafeapp.data.remote.dto.StockRequest
@@ -11,7 +10,6 @@ import com.example.cafeapp.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import androidx.lifecycle.ViewModel
 
 class ManageStockViewModel(
     private val repository: StockRepository = StockRepository(RetrofitClient.api)
@@ -30,7 +28,8 @@ class ManageStockViewModel(
                 if (response.isSuccessful && response.body() != null) {
                     _stockList.value = Resource.Success(response.body()!!.toList())
                 } else {
-                    _stockList.value = Resource.Error("Failed to load stock")
+                    val errorMsg = response.errorBody()?.string() ?: "Failed to load stock"
+                    _stockList.value = Resource.Error(errorMsg)
                 }
             } catch (e: Exception) {
                 _stockList.value = Resource.Error("Network error: ${e.message}")
@@ -38,33 +37,49 @@ class ManageStockViewModel(
         }
     }
 
-    fun addStock(name: String, amount: Int) {
+    // ✅ DITAMBAHKAN parameter unit: String (dengan default value "pcs" agar fleksibel)
+    fun addStock(name: String, amount: Int, unit: String = "pcs") {
         viewModelScope.launch {
             _actionStatus.value = Resource.Loading()
             try {
-                val response = repository.createStock(StockRequest(name, amount))
+                // Buat request dengan 3 parameter: ingredientName, amount, unit
+                val request = StockRequest(
+                    ingredientName = name,
+                    amount = amount,
+                    unit = unit
+                )
+                val response = repository.createStock(request)
                 if (response.isSuccessful) {
                     _actionStatus.value = Resource.Success("Stock added successfully")
                     fetchStock() // Refresh list
                 } else {
-                    _actionStatus.value = Resource.Error("Failed to add stock")
+                    // Ambil pesan error asli dari backend jika ada
+                    val errorMsg = response.errorBody()?.string() ?: "Failed to add stock"
+                    _actionStatus.value = Resource.Error(errorMsg)
                 }
             } catch (e: Exception) {
-                _actionStatus.value = Resource.Error("Network error")
+                _actionStatus.value = Resource.Error("Network error: ${e.message}")
             }
         }
     }
 
-    fun updateStock(id: String, name: String, amount: Int) {
+    // ✅ DITAMBAHKAN parameter unit: String
+    fun updateStock(id: String, name: String, amount: Int, unit: String = "pcs") {
         viewModelScope.launch {
             _actionStatus.value = Resource.Loading()
             try {
-                val response = repository.updateStock(id, StockRequest(name, amount))
+                val request = StockRequest(
+                    ingredientName = name,
+                    amount = amount,
+                    unit = unit
+                )
+                val response = repository.updateStock(id, request)
                 if (response.isSuccessful) {
                     _actionStatus.value = Resource.Success("Stock updated successfully")
-                    fetchStock() // Ambil ulang data terbaru dari backend
+                    fetchStock() // Ambil ulang data terbaru
                 } else {
-                    _actionStatus.value = Resource.Error("Failed to update stock: ${response.code()}")
+                    val errorMsg = response.errorBody()?.string() ?: "Failed to update stock"
+                    _actionStatus.value = Resource.Error(errorMsg)
                 }
             } catch (e: Exception) {
                 _actionStatus.value = Resource.Error("Network error: ${e.message}")
@@ -81,10 +96,11 @@ class ManageStockViewModel(
                     _actionStatus.value = Resource.Success("Stock deleted")
                     fetchStock() // Refresh list
                 } else {
-                    _actionStatus.value = Resource.Error("Failed to delete stock")
+                    val errorMsg = response.errorBody()?.string() ?: "Failed to delete stock"
+                    _actionStatus.value = Resource.Error(errorMsg)
                 }
             } catch (e: Exception) {
-                _actionStatus.value = Resource.Error("Network error")
+                _actionStatus.value = Resource.Error("Network error: ${e.message}")
             }
         }
     }
@@ -92,5 +108,4 @@ class ManageStockViewModel(
     fun resetActionStatus() {
         _actionStatus.value = Resource.Idle()
     }
-
 }

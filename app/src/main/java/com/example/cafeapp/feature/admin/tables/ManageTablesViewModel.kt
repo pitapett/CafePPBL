@@ -1,7 +1,5 @@
 package com.example.cafeapp.feature.admin.tables
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cafeapp.data.remote.RetrofitClient
@@ -13,11 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
-
-//class ManageTablesViewModel(
-//    application: Application,
-//    private val repository: TableRepository = TableRepository(RetrofitClient.api)
-//) : AndroidViewModel(application) {
 
 class ManageTablesViewModel(
     private val repository: TableRepository = TableRepository(RetrofitClient.api)
@@ -45,15 +38,17 @@ class ManageTablesViewModel(
         }
     }
 
-    fun addTable(tableNumber: Int, area: String) {
+    // ✅ Tambahkan parameter seatCount
+    fun addTable(tableNumber: Int, area: String, seatCount: Int) {
         executeTableAction("Added Table") {
-            repository.createTable(TableRequest(tableNumber, area))
+            repository.createTable(TableRequest(tableNumber = tableNumber, area = area, seatCount = seatCount))
         }
     }
 
-    fun updateTable(id: String, tableNumber: Int, area: String) {
+    // ✅ Tambahkan parameter seatCount
+    fun updateTable(id: String, tableNumber: Int, area: String, seatCount: Int) {
         executeTableAction("Updated Table") {
-            repository.updateTable(id, TableRequest(tableNumber, area))
+            repository.updateTable(id, TableRequest(tableNumber = tableNumber, area = area, seatCount = seatCount))
         }
     }
 
@@ -63,7 +58,6 @@ class ManageTablesViewModel(
         }
     }
 
-    // Abstracted helper to prevent boilerplate try/catch blocks
     private fun executeTableAction(successMessage: String, apiCall: suspend () -> Response<*>) {
         viewModelScope.launch {
             _actionStatus.value = Resource.Loading()
@@ -71,7 +65,7 @@ class ManageTablesViewModel(
                 val response = apiCall()
                 if (response.isSuccessful) {
                     _actionStatus.value = Resource.Success(successMessage)
-                    fetchTables() // Automatically refresh the list
+                    fetchTables() // Refresh daftar meja otomatis
                 } else {
                     _actionStatus.value = Resource.Error("Operation failed")
                 }

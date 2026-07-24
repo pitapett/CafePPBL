@@ -1,5 +1,5 @@
 package com.example.cafeapp.data.remote.dto
-
+import com.google.gson.annotations.SerializedName
 data class CreateOrderRequest(
     val tableId: String,
     val order_type: String = "Dine-in",
@@ -16,13 +16,28 @@ data class OrderItemRequest(
 )
 
 data class StockRequest(
-    val ingredient_name: String,
-    val amount: Int
+    @SerializedName("ingredient_name")
+    val ingredientName: String,
+
+    @SerializedName("amount")
+    val amount: Int,
+
+    @SerializedName("unit")
+    val unit: String // <-- Tambahkan field unit ini!
 )
 
 data class TableRequest(
-    val table_number: Int,
-    val area: String
+    @SerializedName("table_number")
+    val tableNumber: Int,
+
+    @SerializedName("area")
+    val area: String,
+
+    @SerializedName("seat_count")
+    val seatCount: Int, // ✅ Tambahkan jumlah kursi/kapasitas meja
+
+    @SerializedName("status")
+    val status: String? = "Available" // ✅ Default status jika diperlukan backend
 )
 
 data class TableStatusRequest(
