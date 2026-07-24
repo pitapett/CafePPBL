@@ -31,8 +31,8 @@ class ManageTablesViewModelTest {
     fun setup() {
         application = mockk(relaxed = true)
         repository = mockk()
-        viewModel = ManageTablesViewModel(application) // ✅ hanya satu parameter
-        viewModel.repository = repository              // ✅ inject mock
+        viewModel = ManageTablesViewModel(application)
+        viewModel.repository = repository
     }
 
     @Test

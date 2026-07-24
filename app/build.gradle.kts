@@ -2,9 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
-}
 
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.24"
+}
 android {
     namespace = "com.example.cafeapp"
     compileSdk = 36
@@ -68,9 +68,13 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.2")     // 👈 PENTING: Untuk setContent di UI Test
 
     // Lifecycle & MVVM
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+// Lifecycle & MVVM
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
     implementation("androidx.activity:activity-ktx:1.9.0")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
 
@@ -99,18 +103,9 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.7.2")
     implementation("androidx.compose.material3:material3:1.3.0")
 
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
-
     implementation("androidx.compose.material:material-icons-extended:1.6.0")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("io.coil-kt:coil-compose:2.7.0")
 }
 
-configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "org.jetbrains.kotlin") {
-            useVersion("1.9.24")
-        }
-    }
-}
+

@@ -126,7 +126,7 @@ fun ManageStockScreen(
             }
         )
     }
-} // <-- Kurung tutup fungsi ManageStockScreen yang tadi hilang ada di sini!
+}
 
 @Composable
 private fun StockItemCard(item: StockResponse, onEditClicked: () -> Unit) {
@@ -158,7 +158,7 @@ private fun StockItemCard(item: StockResponse, onEditClicked: () -> Unit) {
 }
 
 @Composable
-fun StockDialog(
+private fun StockDialog(
     item: StockResponse?,
     onDismiss: () -> Unit,
     onSave: (String, Int, String) -> Unit,

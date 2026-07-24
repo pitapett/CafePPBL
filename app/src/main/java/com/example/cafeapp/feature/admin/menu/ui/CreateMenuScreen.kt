@@ -57,7 +57,7 @@ fun CreateMenuScreen(
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 
                     if (success) {
-                        onNavigateBack() // <--- Add this line to go back on success
+                        onNavigateBack()
                     }
                 }
             }

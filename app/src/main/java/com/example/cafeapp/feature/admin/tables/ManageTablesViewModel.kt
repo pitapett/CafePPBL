@@ -1,5 +1,7 @@
 package com.example.cafeapp.feature.admin.tables
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cafeapp.data.remote.RetrofitClient
