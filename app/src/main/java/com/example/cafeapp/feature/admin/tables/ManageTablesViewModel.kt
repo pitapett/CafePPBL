@@ -2,6 +2,7 @@ package com.example.cafeapp.feature.admin.tables
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cafeapp.data.remote.RetrofitClient
 import com.example.cafeapp.data.remote.dto.TableRequest
@@ -13,10 +14,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
+//class ManageTablesViewModel(
+//    application: Application,
+//    private val repository: TableRepository = TableRepository(RetrofitClient.api)
+//) : AndroidViewModel(application) {
+
 class ManageTablesViewModel(
-    application: Application,
     private val repository: TableRepository = TableRepository(RetrofitClient.api)
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     private val _tables = MutableStateFlow<Resource<List<TableResponse>>>(Resource.Idle())
     val tables: StateFlow<Resource<List<TableResponse>>> = _tables

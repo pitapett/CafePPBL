@@ -9,6 +9,9 @@ object AppRoutes {
     @Serializable
     object SetupRoute
 
+    @Serializable
+    object StaffTableStatusRoute
+
     // --- ADMIN ROUTES ---
     @Serializable
     object AdminDashboardRoute

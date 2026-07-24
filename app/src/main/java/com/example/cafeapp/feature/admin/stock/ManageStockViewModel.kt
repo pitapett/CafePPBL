@@ -11,11 +11,11 @@ import com.example.cafeapp.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import androidx.lifecycle.ViewModel
 
 class ManageStockViewModel(
-    application: Application,
     private val repository: StockRepository = StockRepository(RetrofitClient.api)
-) : AndroidViewModel(application) {
+) : ViewModel() {
     private val _stockList = MutableStateFlow<Resource<List<StockResponse>>>(Resource.Idle())
     val stockList: StateFlow<Resource<List<StockResponse>>> = _stockList
 
@@ -28,7 +28,7 @@ class ManageStockViewModel(
             try {
                 val response = repository.getAllStock()
                 if (response.isSuccessful && response.body() != null) {
-                    _stockList.value = Resource.Success(response.body()!!)
+                    _stockList.value = Resource.Success(response.body()!!.toList())
                 } else {
                     _stockList.value = Resource.Error("Failed to load stock")
                 }
@@ -62,12 +62,12 @@ class ManageStockViewModel(
                 val response = repository.updateStock(id, StockRequest(name, amount))
                 if (response.isSuccessful) {
                     _actionStatus.value = Resource.Success("Stock updated successfully")
-                    fetchStock() // Refresh list
+                    fetchStock() // Ambil ulang data terbaru dari backend
                 } else {
-                    _actionStatus.value = Resource.Error("Failed to update stock")
+                    _actionStatus.value = Resource.Error("Failed to update stock: ${response.code()}")
                 }
             } catch (e: Exception) {
-                _actionStatus.value = Resource.Error("Network error")
+                _actionStatus.value = Resource.Error("Network error: ${e.message}")
             }
         }
     }

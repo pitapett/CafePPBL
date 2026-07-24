@@ -1,5 +1,6 @@
 package com.example.cafeapp.feature.staff.dashboard
 
+import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -11,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,12 +24,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
-// Import your screens and ViewModels
+// Import screens dan ViewModels beserta Factory-nya
 import com.example.cafeapp.feature.staff.orders.ActiveOrdersScreen
 import com.example.cafeapp.feature.staff.orders.ActiveOrdersViewModel
+import com.example.cafeapp.feature.staff.orders.ActiveOrdersViewModelFactory
 import com.example.cafeapp.feature.staff.tablestatus.StaffTableScreen
-import com.example.cafeapp.feature.staff.tablestatus.StaffTableStatusScreen
 import com.example.cafeapp.feature.staff.tablestatus.StaffTableViewModel
+import com.example.cafeapp.feature.staff.tablestatus.StaffTableViewModelFactory
 
 private val CafeNavy = Color(0xFF021A54)
 private val CafePink = Color(0xFFFF85BB)
@@ -43,9 +46,9 @@ private val staffTabs = listOf(StaffTab.ActiveOrders, StaffTab.TableStatus)
 @Composable
 fun StaffDashboardScreen(
     onNewOrderClicked: (String) -> Unit,
-    onLogoutClicked: () -> Unit
+    onLogoutClicked: () -> Unit,
+    onTableStatusClicked: () -> Unit = {} // Dipasang default agar opsional jika pakai BottomNav
 ) {
-    // This is a NESTED navController just for the Bottom Tabs
     val bottomNavController = rememberNavController()
     var showTableInputDialog by remember { mutableStateOf(false) }
 
@@ -63,7 +66,9 @@ fun StaffDashboardScreen(
         bottomBar = { StaffBottomBar(bottomNavController) },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showTableInputDialog = true },
+                onClick = {
+                    showTableInputDialog = true
+                },
                 containerColor = CafeNavy,
                 contentColor = Color.White,
             ) {
@@ -72,44 +77,56 @@ fun StaffDashboardScreen(
         }
     ) { innerPadding ->
 
-        // Nested NavHost for switching tabs without leaving the Dashboard
         NavHost(
             navController = bottomNavController,
             startDestination = StaffTab.ActiveOrders.route,
             modifier = Modifier.padding(innerPadding),
         ) {
+            // TAB 1: ACTIVE ORDERS
             composable(StaffTab.ActiveOrders.route) {
-                val viewModel: ActiveOrdersViewModel = viewModel()
+                val context = LocalContext.current
+                val application = context.applicationContext as Application
 
-                // Fetch data when the tab is opened (from your original code)
+                val viewModel: ActiveOrdersViewModel = viewModel(
+                    factory = ActiveOrdersViewModelFactory(application)
+                )
+
                 LaunchedEffect(Unit) {
                     viewModel.fetchActiveOrders()
                 }
 
-                // Call it exactly as your file expects it!
                 ActiveOrdersScreen(viewModel)
             }
-            composable(StaffTab.TableStatus.route) {
-                val viewModel: StaffTableViewModel = viewModel()
 
-                // Fetch data when the tab is opened
+            // TAB 2: TABLE STATUS
+            composable(StaffTab.TableStatus.route) {
+                val context = LocalContext.current
+                val application = context.applicationContext as Application
+
+                // ✅ PERBAIKAN: Gunakan Custom Factory (StaffTableViewModelFactory)
+                val viewModel: StaffTableViewModel = viewModel(
+                    factory = StaffTableViewModelFactory(application)
+                )
+
                 LaunchedEffect(Unit) {
                     viewModel.fetchTables()
                 }
 
-                // Use your exact screen name and parameter!
-                StaffTableScreen(viewModel)
+                StaffTableScreen(
+                    viewModel = viewModel
+                )
             }
         }
     }
 
+    // Modal dialog dimunculkan saat tombol FAB (+) diklik
     if (showTableInputDialog) {
         TableInputDialog(
             onDismiss = { showTableInputDialog = false },
             onConfirm = { tableNumber ->
                 showTableInputDialog = false
-                onNewOrderClicked(tableNumber) // Sends the table # to main navigation
-            },
+                onNewOrderClicked(tableNumber)
+            }
         )
     }
 }

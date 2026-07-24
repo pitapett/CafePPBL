@@ -2,6 +2,8 @@ package com.example.cafeapp.feature.staff.menu
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.cafeapp.data.local.CafeDatabase
 import com.example.cafeapp.data.local.entity.MenuEntity
@@ -14,8 +16,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-
-// We use AndroidViewModel instead of ViewModel because we need the Application context to open the Room Database
 class StaffMenuViewModel(
     application: Application,
     private val repository: OrderRepository = OrderRepository(
@@ -27,8 +27,8 @@ class StaffMenuViewModel(
 
     val menuState = repository.getMenuStream().stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Companion.WhileSubscribed(5000),
-        initialValue = emptyList<MenuEntity>()
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
     )
 
     fun syncMenuWithServer() {
@@ -44,7 +44,6 @@ class StaffMenuViewModel(
     )
 
     fun addToCart(menuItem: MenuEntity) {
-        // Database writes MUST happen on the background (IO) thread
         viewModelScope.launch(Dispatchers.IO) {
             repository.addToCart(menuItem)
         }
@@ -53,11 +52,23 @@ class StaffMenuViewModel(
     private val _checkoutResult = MutableSharedFlow<Boolean>()
     val checkoutResult = _checkoutResult.asSharedFlow()
 
-    // Change checkoutCart to accept the parameters
     fun checkoutCart(tableNumber: String, staffId: String) {
         viewModelScope.launch {
             val success = repository.processCheckout(tableNumber, staffId)
             _checkoutResult.emit(success)
         }
+    }
+}
+
+// Tambahkan Factory ini di bawah file
+class StaffMenuViewModelFactory(
+    private val application: Application
+) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(StaffMenuViewModel::class.java)) {
+            return StaffMenuViewModel(application) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }

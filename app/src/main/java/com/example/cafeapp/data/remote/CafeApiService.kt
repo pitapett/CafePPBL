@@ -8,6 +8,7 @@ import okhttp3.RequestBody
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import okhttp3.ResponseBody
 
 interface CafeApiService {
 
@@ -105,7 +106,7 @@ interface CafeApiService {
     suspend fun updateStock(
         @Path("id") id: String,
         @Body request: StockRequest
-    ): Response<StockResponse>
+    ): Response<ResponseBody> // <-- UBAH KELUARAN DARI StockResponse JADI ResponseBody
 
     @DELETE("stock/delete/{id}")
     suspend fun deleteStock(@Path("id") id: String): Response<BaseResponse>

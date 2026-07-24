@@ -11,6 +11,7 @@ import com.example.cafeapp.feature.admin.dashboard.AdminDashboardScreen
 import com.example.cafeapp.feature.staff.dashboard.StaffDashboardScreen
 import com.example.cafeapp.feature.staff.menu.StaffMenuScreen
 import com.example.cafeapp.feature.staff.cart.CartDetailScreen
+import com.example.cafeapp.feature.staff.tablestatus.StaffTableScreen
 
 @Composable
 fun CafeAppNavigation(
@@ -83,12 +84,21 @@ fun CafeAppNavigation(
                 onNewOrderClicked = { tableNum ->
                     navController.navigate(AppRoutes.StaffMenuRoute(tableNumber = tableNum))
                 },
+                onTableStatusClicked = {
+                    navController.navigate(AppRoutes.StaffTableStatusRoute)
+                },
                 onLogoutClicked = {
-                    onLogout() // Clear from DataStore
+                    onLogout()
                     navController.navigate(AppRoutes.SetupRoute) {
                         popUpTo(0) { inclusive = true }
                     }
                 }
+            )
+        }
+
+        composable<AppRoutes.StaffTableStatusRoute> {
+            StaffTableScreen(
+                onBackClicked = { navController.popBackStack() }
             )
         }
 

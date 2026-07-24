@@ -2,6 +2,8 @@ package com.example.cafeapp.feature.staff.cart
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.cafeapp.data.local.CafeDatabase
 import com.example.cafeapp.data.local.entity.DraftCartEntity
@@ -34,7 +36,6 @@ class CartDetailViewModel(
     fun updateQuantity(item: DraftCartEntity, isIncrease: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             if (isIncrease) {
-                // DO NOT do item.quantity += 1. Use .copy() instead!
                 val updatedItem = item.copy(quantity = item.quantity + 1)
                 repository.updateCartItem(updatedItem)
             } else {
@@ -50,7 +51,6 @@ class CartDetailViewModel(
 
     fun updateCustomization(item: DraftCartEntity, newNote: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            // Also fixed this one to prevent text jumping bugs!
             val updatedItem = item.copy(customization = newNote)
             repository.updateCartItem(updatedItem)
         }
@@ -67,5 +67,18 @@ class CartDetailViewModel(
             val success = repository.processCheckout(tableNumber, staffId)
             _checkoutResult.emit(success)
         }
+    }
+}
+
+// Tambahkan Factory ini di bagian bawah file
+class CartDetailViewModelFactory(
+    private val application: Application
+) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(CartDetailViewModel::class.java)) {
+            return CartDetailViewModel(application) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }
