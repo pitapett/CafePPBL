@@ -104,7 +104,7 @@ fun CartDetailScreen(
 }
 
 @Composable
-private fun CartItemCard(
+fun CartItemCard(
     item: DraftCartEntity,
     onIncreaseQty: () -> Unit,
     onDecreaseQty: () -> Unit,
@@ -184,7 +184,7 @@ private fun CartItemCard(
 }
 
 @Composable
-private fun CheckoutBottomBar(
+fun CheckoutBottomBar(
     total: Double,
     isCheckingOut: Boolean,
     onCheckoutClicked: () -> Unit

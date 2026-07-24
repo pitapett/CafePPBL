@@ -67,6 +67,10 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.2") // 👈 PENTING: Untuk createComposeRule()
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.2")     // 👈 PENTING: Untuk setContent di UI Test
 
+    // ⚠️ PERBAIKAN DI SINI: Ditambahkan versi :1.7.2
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.2")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.2")
+
     // Lifecycle & MVVM
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
@@ -90,7 +94,6 @@ dependencies {
     ksp("androidx.room:room-compiler:$room_version")
 
     // Jetpack Compose
-    implementation("androidx.activity:activity-compose:1.9.0")
     implementation("androidx.navigation:navigation-compose:2.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
