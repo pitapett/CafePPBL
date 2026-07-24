@@ -36,7 +36,7 @@ fun ManageStockScreen(
     var showDialog by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<StockResponse?>(null) }
 
-    // Refresh data whenever the screen enters the RESUMED state (e.g., coming back from CreateMenu)
+    // Refresh data whenever the screen enters the RESUMED state
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -68,8 +68,7 @@ fun ManageStockScreen(
             FloatingActionButton(onClick = {
                 selectedItem = null
                 showDialog = true
-            }
-            ) {
+            }) {
                 Icon(Icons.Default.Add, contentDescription = "Add Stock")
             }
         }
@@ -77,7 +76,11 @@ fun ManageStockScreen(
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             when (val state = stockState) {
                 is Resource.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                is Resource.Error -> Text(text = state.message ?: "Error", color = MaterialTheme.colorScheme.error, modifier = Modifier.align(Alignment.Center))
+                is Resource.Error -> Text(
+                    text = state.message ?: "Error",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.Center)
+                )
                 is Resource.Success -> {
                     val stockItems = state.data ?: emptyList()
                     if (stockItems.isEmpty()) {
@@ -109,11 +112,11 @@ fun ManageStockScreen(
         StockDialog(
             item = selectedItem,
             onDismiss = { showDialog = false },
-            onSave = { name, amount ->
+            onSave = { name, amount, unit ->
                 if (selectedItem == null) {
-                    viewModel.addStock(name, amount)
+                    viewModel.addStock(name, amount, unit)
                 } else {
-                    viewModel.updateStock(selectedItem!!.id, name, amount)
+                    viewModel.updateStock(selectedItem!!.id, name, amount, unit)
                 }
                 showDialog = false
             },
@@ -123,20 +126,29 @@ fun ManageStockScreen(
             }
         )
     }
-}
+} // <-- Kurung tutup fungsi ManageStockScreen yang tadi hilang ada di sini!
 
 @Composable
 private fun StockItemCard(item: StockResponse, onEditClicked: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(text = item.ingredient_name, style = MaterialTheme.typography.titleMedium)
+                Text(text = item.ingredientName, style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "Qty: ${item.amount}", style = MaterialTheme.typography.bodyMedium)
+                // Menampilkan jumlah + unit (contoh: "Qty: 200 Bungkus")
+                Text(
+                    text = "Qty: ${item.amount} ${item.unit ?: ""}".trim(),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             IconButton(onClick = onEditClicked) {
                 Icon(Icons.Default.Edit, contentDescription = "Edit")
@@ -149,11 +161,12 @@ private fun StockItemCard(item: StockResponse, onEditClicked: () -> Unit) {
 fun StockDialog(
     item: StockResponse?,
     onDismiss: () -> Unit,
-    onSave: (String, Int) -> Unit,
+    onSave: (String, Int, String) -> Unit,
     onDelete: () -> Unit
 ) {
-    var name by remember { mutableStateOf(item?.ingredient_name ?: "") }
+    var name by remember { mutableStateOf(item?.ingredientName ?: "") }
     var amount by remember { mutableStateOf(item?.amount?.toString() ?: "") }
+    var unit by remember { mutableStateOf(item?.unit ?: "Bungkus") }
     val isEditing = item != null
 
     AlertDialog(
@@ -161,23 +174,55 @@ fun StockDialog(
         title = { Text(if (isEditing) "Edit Stock" else "Add Stock") },
         text = {
             Column {
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") }, singleLine = true)
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Name") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(value = amount, onValueChange = { amount = it }, label = { Text("Quantity") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), singleLine = true)
+                OutlinedTextField(
+                    value = amount,
+                    onValueChange = { amount = it },
+                    label = { Text("Quantity") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = unit,
+                    onValueChange = { unit = it },
+                    label = { Text("Unit (e.g. Bungkus, Kg, Pcs)") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         },
         confirmButton = {
             Button(onClick = {
                 val qty = amount.toIntOrNull() ?: 0
-                if (name.isNotBlank()) onSave(name, qty)
-            }) { Text("Save") }
+                if (name.isNotBlank() && unit.isNotBlank()) {
+                    onSave(name, qty, unit)
+                }
+            }) {
+                Text("Save")
+            }
         },
         dismissButton = {
             Row {
                 if (isEditing) {
-                    TextButton(onClick = onDelete, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text("Delete") }
+                    TextButton(
+                        onClick = onDelete,
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("Delete")
+                    }
                 }
-                TextButton(onClick = onDismiss) { Text("Cancel") }
+                TextButton(onClick = onDismiss) {
+                    Text("Cancel")
+                }
             }
         }
     )

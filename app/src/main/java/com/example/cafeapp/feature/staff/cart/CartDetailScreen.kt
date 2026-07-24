@@ -1,5 +1,6 @@
 package com.example.cafeapp.feature.staff.cart
 
+import android.app.Application
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,7 +26,11 @@ fun CartDetailScreen(
     tableNumber: String,
     onBackClicked: () -> Unit,
     onCheckoutSuccess: () -> Unit,
-    viewModel: CartDetailViewModel = viewModel()
+    // Tambahkan context & gunakan CartDetailViewModelFactory
+    context: Application = LocalContext.current.applicationContext as Application,
+    viewModel: CartDetailViewModel = viewModel(
+        factory = CartDetailViewModelFactory(context)
+    )
 ) {
     val context = LocalContext.current
     val cartItems by viewModel.liveCartState.collectAsState()

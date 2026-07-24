@@ -1,9 +1,7 @@
 package com.example.cafeapp.feature.staff.menu
 
+import android.app.Application
 import androidx.compose.foundation.layout.*
-import coil.compose.AsyncImage
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -15,31 +13,35 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.cafeapp.data.local.entity.MenuEntity
-import com.example.cafeapp.feature.staff.menu.StaffMenuViewModel
+
 private const val IMAGE_BASE_URL = "http://10.0.2.2:3000/uploads/"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StaffMenuScreen(
     tableNumber: String,
     onBackClicked: () -> Unit,
     onViewCartClicked: () -> Unit,
-    viewModel: StaffMenuViewModel = viewModel()
+    context: Application = LocalContext.current.applicationContext as Application,
+    viewModel: StaffMenuViewModel = viewModel(
+        factory = StaffMenuViewModelFactory(context)
+    )
 ) {
+    // Dipanggil 1x saja saat screen pertama terbuka
     LaunchedEffect(Unit) {
         viewModel.syncMenuWithServer()
     }
 
-    // Observe the states from your Room Database via the ViewModel
     val menuItems by viewModel.menuState.collectAsState()
     val cartItems by viewModel.liveCart.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.syncMenuWithServer()
-    }
 
     val cartItemCount = cartItems.sumOf { it.quantity }
     val cartTotal = cartItems.sumOf { it.price * it.quantity }
@@ -81,22 +83,17 @@ fun StaffMenuScreen(
 
                 MenuItemCard(
                     item = item,
-                    cartQuantity = cartQuantity,
-                    onAddClicked = { viewModel.addToCart(item) },
-                    onDecreaseClicked = { viewModel.decreaseFromCart(item) }
+                    onAddClicked = { viewModel.addToCart(item) }
                 )
             }
         }
     }
 }
 
-// LOCAL COMPONENT
 @Composable
 private fun MenuItemCard(
     item: MenuEntity,
-    cartQuantity: Int,
-    onAddClicked: () -> Unit,
-    onDecreaseClicked: () -> Unit
+    onAddClicked: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),

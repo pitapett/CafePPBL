@@ -2,6 +2,8 @@ package com.example.cafeapp.feature.staff.menu
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.cafeapp.data.local.CafeDatabase
 import com.example.cafeapp.data.local.entity.MenuEntity
@@ -27,7 +29,7 @@ class StaffMenuViewModel(
     val menuState = repository.getMenuStream().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList<MenuEntity>()
+        initialValue = emptyList()
     )
 
     val liveCart = repository.getLiveCartStream().stateIn(
@@ -75,10 +77,7 @@ class StaffMenuViewModel(
     val checkoutResult =
         _checkoutResult.asSharedFlow()
 
-    fun checkoutCart(
-        tableNumber: String,
-        staffId: String
-    ) {
+    fun checkoutCart(tableNumber: String, staffId: String) {
         viewModelScope.launch {
             val success =
                 repository.processCheckout(
@@ -88,5 +87,18 @@ class StaffMenuViewModel(
 
             _checkoutResult.emit(success)
         }
+    }
+}
+
+// Tambahkan Factory ini di bawah file
+class StaffMenuViewModelFactory(
+    private val application: Application
+) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(StaffMenuViewModel::class.java)) {
+            return StaffMenuViewModel(application) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }

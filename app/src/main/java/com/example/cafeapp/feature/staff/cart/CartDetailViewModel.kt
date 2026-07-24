@@ -2,6 +2,8 @@ package com.example.cafeapp.feature.staff.cart
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.cafeapp.data.local.CafeDatabase
 import com.example.cafeapp.data.local.entity.DraftCartEntity
@@ -43,12 +45,7 @@ class CartDetailViewModel(
         viewModelScope.launch(Dispatchers.IO) {
 
             if (isIncrease) {
-
-                val updatedItem =
-                    item.copy(
-                        quantity = item.quantity + 1
-                    )
-
+                val updatedItem = item.copy(quantity = item.quantity + 1)
                 repository.updateCartItem(updatedItem)
 
             } else {
@@ -75,12 +72,7 @@ class CartDetailViewModel(
         newNote: String
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-
-            val updatedItem =
-                item.copy(
-                    customization = newNote
-                )
-
+            val updatedItem = item.copy(customization = newNote)
             repository.updateCartItem(updatedItem)
         }
     }
@@ -105,5 +97,18 @@ class CartDetailViewModel(
 
             _checkoutResult.emit(success)
         }
+    }
+}
+
+// Tambahkan Factory ini di bagian bawah file
+class CartDetailViewModelFactory(
+    private val application: Application
+) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(CartDetailViewModel::class.java)) {
+            return CartDetailViewModel(application) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }

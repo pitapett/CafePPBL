@@ -2,6 +2,8 @@ package com.example.cafeapp.feature.staff.tablestatus
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.cafeapp.data.remote.RetrofitClient
 import com.example.cafeapp.data.remote.dto.TableResponse
@@ -82,5 +84,18 @@ class StaffTableViewModel(
                 e.printStackTrace()
             }
         }
+    }
+}
+
+// Factory wajib agar ViewModel bisa dibuat di mana saja tanpa crash
+class StaffTableViewModelFactory(
+    private val application: Application
+) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(StaffTableViewModel::class.java)) {
+            return StaffTableViewModel(application) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }

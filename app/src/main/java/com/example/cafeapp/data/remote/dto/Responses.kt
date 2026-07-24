@@ -45,8 +45,13 @@ data class OrderData(
 
 data class StockResponse(
     val id: String,
-    val ingredient_name: String,
-    val amount: Int
+
+    @SerializedName("ingredient_name")
+    val ingredientName: String,
+
+    val amount: Int,
+
+    val unit: String? = "pcs" // Tambahkan unit agar cocok dengan backend
 )
 
 
