@@ -184,7 +184,7 @@ private fun CartItemCard(
 }
 
 @Composable
-private fun CheckoutBottomBar(
+fun CheckoutBottomBar(
     total: Double,
     isCheckingOut: Boolean,
     onCheckoutClicked: () -> Unit
