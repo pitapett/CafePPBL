@@ -23,7 +23,7 @@ class StockDialogTest {
 
         val existingStock = StockResponse(
             id = "1",
-            ingredientName = "Milk", // Sesuaikan nama properti di StockResponse DTO kamu
+            ingredientName = "Milk",
             amount = 10,
             unit = "Bungkus"
         )
@@ -32,7 +32,6 @@ class StockDialogTest {
             StockDialog(
                 item = existingStock,
                 onDismiss = {},
-                // ✅ Update lambda dengan 3 parameter (name, amount, unit)
                 onSave = { name, amount, unit ->
                     savedName = name
                     savedAmount = amount
@@ -44,16 +43,13 @@ class StockDialogTest {
 
         composeTestRule.onNodeWithText("Edit Stock").assertExists()
 
-        // Cari berdasarkan label TextField-nya, lalu ganti teksnya
         composeTestRule.onNodeWithText("Quantity")
             .performTextClearance()
         composeTestRule.onNodeWithText("Quantity")
             .performTextInput("50")
 
-        // Trigger save
         composeTestRule.onNodeWithText("Save").performClick()
 
-        // Verifikasi hasil dengan JUnit assertEquals
         assertEquals("Milk", savedName)
         assertEquals(50, savedAmount)
         assertEquals("Bungkus", savedUnit)

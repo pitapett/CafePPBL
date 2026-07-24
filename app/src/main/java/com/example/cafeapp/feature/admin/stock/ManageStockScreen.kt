@@ -32,11 +32,9 @@ fun ManageStockScreen(
     val actionStatus by viewModel.actionStatus.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Dialog State
     var showDialog by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<StockResponse?>(null) }
 
-    // Refresh data whenever the screen enters the RESUMED state
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -126,7 +124,7 @@ fun ManageStockScreen(
             }
         )
     }
-} // <-- Kurung tutup fungsi ManageStockScreen yang tadi hilang ada di sini!
+}
 
 @Composable
 private fun StockItemCard(item: StockResponse, onEditClicked: () -> Unit) {
@@ -144,7 +142,6 @@ private fun StockItemCard(item: StockResponse, onEditClicked: () -> Unit) {
             Column {
                 Text(text = item.ingredientName, style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(4.dp))
-                // Menampilkan jumlah + unit (contoh: "Qty: 200 Bungkus")
                 Text(
                     text = "Qty: ${item.amount} ${item.unit ?: ""}".trim(),
                     style = MaterialTheme.typography.bodyMedium

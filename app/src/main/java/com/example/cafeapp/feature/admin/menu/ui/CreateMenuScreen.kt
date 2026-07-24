@@ -22,10 +22,9 @@ fun CreateMenuScreen(
     // State untuk input field
     var name by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") } // Tambahkan deskripsi
+    var description by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // State untuk loading (opsional)
     var isLoading by remember { mutableStateOf(false) }
 
     val launcher = rememberLauncherForActivityResult(
@@ -57,7 +56,7 @@ fun CreateMenuScreen(
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 
                     if (success) {
-                        onNavigateBack() // <--- Add this line to go back on success
+                        onNavigateBack()
                     }
                 }
             }

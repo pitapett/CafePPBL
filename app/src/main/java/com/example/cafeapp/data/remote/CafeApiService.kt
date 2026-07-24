@@ -109,7 +109,7 @@ interface CafeApiService {
     ): Response<ResponseBody> // <-- UBAH KELUARAN DARI StockResponse JADI ResponseBody
 
     @DELETE("stock/delete/{id}")
-    suspend fun deleteStock(@Path("id") id: String): Response<BaseResponse>
+    suspend fun deleteStock(@Path("id") id: String): Response<ResponseBody>
 
 
 }

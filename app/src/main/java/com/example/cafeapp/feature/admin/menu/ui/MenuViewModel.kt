@@ -19,9 +19,6 @@ import com.example.cafeapp.data.remote.CafeApiService
 
 class MenuViewModel(val api: CafeApiService = RetrofitClient.api) : ViewModel() {
 
-//    private val api: CafeApiService = RetrofitClient.api
-
-    // State untuk EditMenuScreen
     private val _menu = MutableStateFlow<MenuResponse?>(null)
     val menu: StateFlow<MenuResponse?> = _menu
 
@@ -51,7 +48,6 @@ class MenuViewModel(val api: CafeApiService = RetrofitClient.api) : ViewModel() 
         }
     }
 
-    // ========== CREATE MENU (sudah ada) ==========
     fun createMenu(
         context: Context,
         name: String,
@@ -92,14 +88,13 @@ class MenuViewModel(val api: CafeApiService = RetrofitClient.api) : ViewModel() 
         }
     }
 
-    // ========== UPDATE MENU (sudah ada) ==========
     fun updateMenu(
         context: Context,
         id: String,
         name: String,
         price: String,
         category: String,
-        drinkCat: String?,   // nullable
+        drinkCat: String?,
         desc: String,
         imageUri: Uri?,
         onResult: (Boolean, String) -> Unit
@@ -109,7 +104,7 @@ class MenuViewModel(val api: CafeApiService = RetrofitClient.api) : ViewModel() 
                 val namePart = name.toRequestBody("text/plain".toMediaType())
                 val pricePart = price.toRequestBody("text/plain".toMediaType())
                 val catPart = category.toRequestBody("text/plain".toMediaType())
-                val drinkPart = drinkCat?.toRequestBody("text/plain".toMediaType()) // nullable
+                val drinkPart = drinkCat?.toRequestBody("text/plain".toMediaType())
                 val descPart = desc.toRequestBody("text/plain".toMediaType())
 
                 var imagePart: MultipartBody.Part? = null
@@ -130,7 +125,7 @@ class MenuViewModel(val api: CafeApiService = RetrofitClient.api) : ViewModel() 
                     name = namePart,
                     price = pricePart,
                     category = catPart,
-                    drinkCategory = drinkPart, // nullable
+                    drinkCategory = drinkPart,
                     description = descPart,
                     image = imagePart
                 )

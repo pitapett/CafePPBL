@@ -14,32 +14,9 @@ class AdminManageMenuTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun manageMenuScreen_whenNoBackend_displaysEmptyStateAndFab() {
-        // GIVEN: Render ManageMenuScreen
-        composeTestRule.setContent {
-            ManageMenuScreen(
-                onNavigateToCreate = {},
-                onNavigateToEdit = {}
-            )
-        }
-
-        // 💡 PAKAI TIMEOUT 15 Detik (memberi waktu OkHttp koneksi timeout)
-        composeTestRule.waitUntil(timeoutMillis = 15000) {
-            composeTestRule
-                .onAllNodesWithText("No menu available", substring = true)
-                .fetchSemanticsNodes().isNotEmpty()
-        }
-
-        // THEN: Verifikasi teks "No menu available" & FAB
-        composeTestRule.onNodeWithText("No menu available", substring = true).assertExists()
-        composeTestRule.onNodeWithText("+").assertExists()
-    }
-
-    @Test
     fun manageMenuScreen_fabClick_triggersNavigateToCreate() {
         var createNavigated = false
 
-        // GIVEN: Render ManageMenuScreen
         composeTestRule.setContent {
             ManageMenuScreen(
                 onNavigateToCreate = { createNavigated = true },

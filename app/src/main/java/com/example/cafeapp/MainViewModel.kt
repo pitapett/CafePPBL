@@ -22,7 +22,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             repository.deviceRole
                 .catch {
-                    // If DataStore fails to read, fallback to a null role and proceed
                     emit(null)
                 }
                 .collect { role ->

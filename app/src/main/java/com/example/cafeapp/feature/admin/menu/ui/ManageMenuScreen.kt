@@ -38,13 +38,11 @@ fun ManageMenuScreen(
     var menus by remember { mutableStateOf<List<MenuResponse>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
-    // State untuk delete
     var deletingId by remember { mutableStateOf<String?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var selectedMenuId by remember { mutableStateOf<String?>(null) }
     var selectedMenuName by remember { mutableStateOf("") }
 
-    // Fungsi load data (suspend)
     suspend fun loadData() {
         isLoading = true
         try {
@@ -64,7 +62,6 @@ fun ManageMenuScreen(
         isLoading = false
     }
 
-    // Load data saat pertama kali
     LaunchedEffect(Unit) {
         loadData()
     }
@@ -177,7 +174,6 @@ fun ManageMenuScreen(
         }
     }
 
-    // Dialog konfirmasi delete
     if (showDeleteDialog && selectedMenuId != null) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
@@ -193,7 +189,6 @@ fun ManageMenuScreen(
                         val id = selectedMenuId ?: return@Button
                         deletingId = id
 
-                        // Panggil delete di ViewModel
                         viewModel.deleteMenu(id) { success, message ->
                             deletingId = null
                             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()

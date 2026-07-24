@@ -27,13 +27,10 @@ class CheckoutBottomBarTest {
             )
         }
 
-        // Pastikan total harga muncul
         composeTestRule.onNodeWithText("75000", substring = true).assertExists()
 
-        // Klik tombol confirm checkout
         composeTestRule.onNodeWithText("Confirm Checkout").performClick()
 
-        // Verifikasi callback terpanggil
         assertTrue(checkoutTriggered)
     }
 
@@ -49,11 +46,9 @@ class CheckoutBottomBarTest {
             )
         }
 
-        // Verifikasi bahwa tombol dalam keadaan Disabled saat loading
         composeTestRule.onNode(hasClickAction())
             .assertIsNotEnabled()
 
-        // Callback pastinya tidak pernah dipanggil
         assertFalse(checkoutTriggered)
     }
 }

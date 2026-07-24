@@ -250,7 +250,6 @@ fun EditMenuScreen(
                             }
 
                             isUpdating = true
-                            // Perbaiki tipe data: pastikan drinkCategory String? tetap String?
                             viewModel.updateMenu(
                                 context = context,
                                 id = menuId,

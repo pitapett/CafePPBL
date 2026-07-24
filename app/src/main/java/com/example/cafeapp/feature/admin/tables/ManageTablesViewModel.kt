@@ -13,11 +13,8 @@ import kotlinx.coroutines.launch
 import retrofit2.Response
 
 class ManageTablesViewModel(
-    application: Application
-//    val repository: TableRepository = TableRepository(RetrofitClient.api)
-) : AndroidViewModel(application) {
-
     internal var repository: TableRepository = TableRepository(RetrofitClient.api)
+) : ViewModel() {
 
     private val _tables = MutableStateFlow<Resource<List<TableResponse>>>(Resource.Idle())
     val tables: StateFlow<Resource<List<TableResponse>>> = _tables
@@ -33,7 +30,8 @@ class ManageTablesViewModel(
                 if (response.isSuccessful && response.body() != null) {
                     _tables.value = Resource.Success(response.body()!!)
                 } else {
-                    _tables.value = Resource.Error("Failed to fetch tables")
+                    val errorMsg = response.errorBody()?.string() ?: "Failed to fetch tables"
+                    _tables.value = Resource.Error(errorMsg)
                 }
             } catch (e: Exception) {
                 _tables.value = Resource.Error("Network error: ${e.message}")
@@ -41,14 +39,12 @@ class ManageTablesViewModel(
         }
     }
 
-    // ✅ Tambahkan parameter seatCount
     fun addTable(tableNumber: Int, area: String, seatCount: Int) {
         executeTableAction("Added Table") {
             repository.createTable(TableRequest(tableNumber = tableNumber, area = area, seatCount = seatCount))
         }
     }
 
-    // ✅ Tambahkan parameter seatCount
     fun updateTable(id: String, tableNumber: Int, area: String, seatCount: Int) {
         executeTableAction("Updated Table") {
             repository.updateTable(id, TableRequest(tableNumber = tableNumber, area = area, seatCount = seatCount))
@@ -68,9 +64,10 @@ class ManageTablesViewModel(
                 val response = apiCall()
                 if (response.isSuccessful) {
                     _actionStatus.value = Resource.Success(successMessage)
-                    fetchTables() // Refresh daftar meja otomatis
+                    fetchTables()
                 } else {
-                    _actionStatus.value = Resource.Error("Operation failed")
+                    val errorMsg = response.errorBody()?.string() ?: "Operation failed"
+                    _actionStatus.value = Resource.Error(errorMsg)
                 }
             } catch (e: Exception) {
                 _actionStatus.value = Resource.Error("Network error: ${e.message}")

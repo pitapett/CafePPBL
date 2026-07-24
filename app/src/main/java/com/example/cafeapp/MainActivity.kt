@@ -21,7 +21,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // Apply the default Material 3 Theme and Surface
             MaterialTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),

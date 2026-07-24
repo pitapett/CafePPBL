@@ -16,7 +16,6 @@ class AdminEditMenuTest {
 
     @Test
     fun editMenuScreen_whenBackendIsOffline_showsErrorOrRetryButton() {
-        // GIVEN: Render EditMenuScreen tanpa backend
         composeTestRule.setContent {
             EditMenuScreen(
                 menuId = "123",

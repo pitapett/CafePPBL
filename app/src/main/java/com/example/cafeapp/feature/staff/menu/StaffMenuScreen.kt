@@ -35,7 +35,6 @@ fun StaffMenuScreen(
         factory = StaffMenuViewModelFactory(context)
     )
 ) {
-    // Dipanggil 1x saja saat screen pertama terbuka
     LaunchedEffect(Unit) {
         viewModel.syncMenuWithServer()
     }
@@ -78,7 +77,6 @@ fun StaffMenuScreen(
             contentPadding = PaddingValues(bottom = 88.dp, top = 8.dp)
         ) {
             items(menuItems) { item ->
-                // Calculate the specific quantity for this item from the active cart state
                 val cartQuantity = cartItems.find { it.menuId == item.id }?.quantity ?: 0
 
                 MenuItemCard(

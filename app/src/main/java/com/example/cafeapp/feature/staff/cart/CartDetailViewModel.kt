@@ -100,7 +100,6 @@ class CartDetailViewModel(
     }
 }
 
-// Tambahkan Factory ini di bagian bawah file
 class CartDetailViewModelFactory(
     private val application: Application
 ) : ViewModelProvider.Factory {

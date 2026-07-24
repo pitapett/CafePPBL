@@ -17,12 +17,6 @@ class ManageMenuViewModel(
     private val repository: OrderRepository
 ) : AndroidViewModel(application) {
 
-//    internal var repository: OrderRepository = OrderRepository(
-//        RetrofitClient.api,
-//        CafeDatabase.getDatabase(application).menuDao(),
-//        CafeDatabase.getDatabase(application).draftCartDao()
-//    )
-
     private val _menuState =
         MutableStateFlow<List<MenuEntity>>(emptyList())
 

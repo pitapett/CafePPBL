@@ -24,15 +24,12 @@ class PaymentMethodDialogTest {
             )
         }
 
-        // Verify dialog title and options exist
         composeTestRule.onNodeWithText("Select Payment Method").assertExists()
         composeTestRule.onNodeWithText("Cash").assertExists()
         composeTestRule.onNodeWithText("QRIS").assertExists()
 
-        // Simulate clicking the QRIS option
         composeTestRule.onNodeWithText("QRIS").performClick()
 
-        // Assert the callback received the correct method string
         assert(selectedMethod == "QRIS")
     }
 }

@@ -34,11 +34,9 @@ fun ManageTablesScreen(
     val actionStatus by viewModel.actionStatus.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Dialog State
     var showDialog by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<TableResponse?>(null) }
 
-    // Auto-refresh saat screen dibuka kembali (ON_RESUME)
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -165,7 +163,6 @@ private fun TableGridCard(table: TableResponse, onClick: () -> Unit) {
                 text = "Area: ${table.area}",
                 style = MaterialTheme.typography.bodyMedium
             )
-            // ✅ Tampilkan informasi Kapasitas Kursi
             Text(
                 text = "Seats: ${table.seatCount}",
                 style = MaterialTheme.typography.bodySmall,
@@ -219,7 +216,6 @@ private fun TableDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                // ✅ Input Field baru untuk Seat Count
                 OutlinedTextField(
                     value = seatCount,
                     onValueChange = { seatCount = it },

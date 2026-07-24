@@ -47,7 +47,7 @@ private val staffTabs = listOf(StaffTab.ActiveOrders, StaffTab.TableStatus)
 fun StaffDashboardScreen(
     onNewOrderClicked: (String) -> Unit,
     onLogoutClicked: () -> Unit,
-    onTableStatusClicked: () -> Unit = {} // Dipasang default agar opsional jika pakai BottomNav
+    onTableStatusClicked: () -> Unit = {}
 ) {
     val bottomNavController = rememberNavController()
     var showTableInputDialog by remember { mutableStateOf(false) }

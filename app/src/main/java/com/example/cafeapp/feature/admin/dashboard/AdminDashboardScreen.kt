@@ -89,7 +89,6 @@ fun AdminDashboardScreen(
                 )
             }
 
-            // Perbaiki rute: gunakan {id} bukan {menu}
             composable(
                 route = "edit_menu/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType })
