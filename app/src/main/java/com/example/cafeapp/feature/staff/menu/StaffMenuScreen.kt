@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,7 +27,7 @@ fun StaffMenuScreen(
     tableNumber: String,
     onBackClicked: () -> Unit,
     onViewCartClicked: () -> Unit,
-    viewModel: StaffMenuViewModel = viewModel() // Inject your existing ViewModel
+    viewModel: StaffMenuViewModel = viewModel()
 ) {
     LaunchedEffect(Unit) {
         viewModel.syncMenuWithServer()
@@ -36,12 +37,10 @@ fun StaffMenuScreen(
     val menuItems by viewModel.menuState.collectAsState()
     val cartItems by viewModel.liveCart.collectAsState()
 
-    // Trigger a background sync with the server when the screen opens
     LaunchedEffect(Unit) {
         viewModel.syncMenuWithServer()
     }
 
-    // Dynamically calculate cart totals
     val cartItemCount = cartItems.sumOf { it.quantity }
     val cartTotal = cartItems.sumOf { it.price * it.quantity }
 
@@ -62,13 +61,12 @@ fun StaffMenuScreen(
                     onClick = onViewCartClicked,
                     icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "View Cart") },
                     text = {
-                        Text("View Cart ($cartItemCount) - $${String.format("%.2f", cartTotal)}")
+                        Text("View Cart ($cartItemCount) - Rp ${cartTotal.toInt()}")
                     }
                 )
             }
         }
     ) { paddingValues ->
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -78,21 +76,27 @@ fun StaffMenuScreen(
             contentPadding = PaddingValues(bottom = 88.dp, top = 8.dp)
         ) {
             items(menuItems) { item ->
+                // Calculate the specific quantity for this item from the active cart state
+                val cartQuantity = cartItems.find { it.menuId == item.id }?.quantity ?: 0
+
                 MenuItemCard(
                     item = item,
-                    // Pass the actual MenuEntity straight to the ViewModel when clicked
-                    onAddClicked = { viewModel.addToCart(item) }
+                    cartQuantity = cartQuantity,
+                    onAddClicked = { viewModel.addToCart(item) },
+                    onDecreaseClicked = { viewModel.decreaseFromCart(item) }
                 )
             }
         }
     }
 }
 
-// 🧱 LOCAL COMPONENT
+// LOCAL COMPONENT
 @Composable
 private fun MenuItemCard(
-    item: MenuEntity, // Uses your Room Entity
-    onAddClicked: () -> Unit
+    item: MenuEntity,
+    cartQuantity: Int,
+    onAddClicked: () -> Unit,
+    onDecreaseClicked: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
