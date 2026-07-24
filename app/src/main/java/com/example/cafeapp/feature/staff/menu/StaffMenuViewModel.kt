@@ -14,27 +14,26 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-// 1. ONLY Application is in the constructor
 class StaffMenuViewModel(
-    application: Application,
-    val repository: OrderRepository = OrderRepository(
+    application: Application
+) : AndroidViewModel(application) {
+
+    internal var repository: OrderRepository = OrderRepository(
         RetrofitClient.api,
         CafeDatabase.getDatabase(application).menuDao(),
         CafeDatabase.getDatabase(application).draftCartDao()
     )
-) : AndroidViewModel(application) {
-
-    // 2. Initialize the repository inside the class body
-//    private val repository: OrderRepository = OrderRepository(
-//        RetrofitClient.api,
-//        CafeDatabase.getDatabase(application).menuDao(),
-//        CafeDatabase.getDatabase(application).draftCartDao()
-//    )
 
     val menuState = repository.getMenuStream().stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Companion.WhileSubscribed(5000),
+        started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList<MenuEntity>()
+    )
+
+    val liveCart = repository.getLiveCartStream().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
     )
 
     fun syncMenuWithServer() {
@@ -43,14 +42,7 @@ class StaffMenuViewModel(
         }
     }
 
-    val liveCart = repository.getLiveCartStream().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
-
     fun addToCart(menuItem: MenuEntity) {
-        // Database writes MUST happen on the background (IO) thread
         viewModelScope.launch(Dispatchers.IO) {
             repository.addToCart(menuItem)
         }
@@ -58,29 +50,42 @@ class StaffMenuViewModel(
 
     fun decreaseFromCart(menuItem: MenuEntity) {
         viewModelScope.launch(Dispatchers.IO) {
-            // Find the item in the current cart state
-            val existingItem = liveCart.value.find { it.menuId == menuItem.id }
+            val existingItem =
+                liveCart.value.find {
+                    it.menuId == menuItem.id
+                }
 
             if (existingItem != null) {
                 if (existingItem.quantity > 1) {
-                    // Use .copy() to safely mutate the data class
-                    val updatedItem = existingItem.copy(quantity = existingItem.quantity - 1)
+                    val updatedItem = existingItem.copy(
+                        quantity = existingItem.quantity - 1
+                    )
+
                     repository.updateCartItem(updatedItem)
                 } else {
-                    // If quantity reaches 0, remove it entirely from the cart
                     repository.deleteCartItem(existingItem)
                 }
             }
         }
     }
 
-    private val _checkoutResult = MutableSharedFlow<Boolean>()
-    val checkoutResult = _checkoutResult.asSharedFlow()
+    private val _checkoutResult =
+        MutableSharedFlow<Boolean>()
 
-    // Change checkoutCart to accept the parameters
-    fun checkoutCart(tableNumber: String, staffId: String) {
+    val checkoutResult =
+        _checkoutResult.asSharedFlow()
+
+    fun checkoutCart(
+        tableNumber: String,
+        staffId: String
+    ) {
         viewModelScope.launch {
-            val success = repository.processCheckout(tableNumber, staffId)
+            val success =
+                repository.processCheckout(
+                    tableNumber,
+                    staffId
+                )
+
             _checkoutResult.emit(success)
         }
     }

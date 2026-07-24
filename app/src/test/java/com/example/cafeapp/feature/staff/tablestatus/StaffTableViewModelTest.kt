@@ -33,7 +33,9 @@ class StaffTableViewModelTest {
         application = mockk(relaxed = true)
         repository = mockk()
 
-        viewModel = StaffTableViewModel(application, repository)
+        viewModel = StaffTableViewModel(application)
+
+        viewModel.repository = repository
     }
 
     @Test

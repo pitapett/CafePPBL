@@ -12,58 +12,74 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-// 1. Only 'application' stays in the constructor
 class ActiveOrdersViewModel(
-    application: Application,
-    private val repository: OrderRepository = OrderRepository(
+    application: Application
+) : AndroidViewModel(application) {
+
+    internal var repository: OrderRepository = OrderRepository(
         RetrofitClient.api,
         CafeDatabase.getDatabase(application).menuDao(),
         CafeDatabase.getDatabase(application).draftCartDao()
     )
-) : AndroidViewModel(application) {
 
-    // 2. Initialize the repository as a private variable inside the class
-//    private val repository: OrderRepository = OrderRepository(
-//        RetrofitClient.api,
-//        CafeDatabase.getDatabase(application).menuDao(),
-//        CafeDatabase.getDatabase(application).draftCartDao()
-//    )
+    private val _orders =
+        MutableStateFlow<Resource<List<ProcessOrderResponse>>>(
+            Resource.Idle()
+        )
 
-    private val _orders = MutableStateFlow<Resource<List<ProcessOrderResponse>>>(Resource.Idle())
     val orders: StateFlow<Resource<List<ProcessOrderResponse>>> = _orders
 
-    private val _paymentStatus = MutableStateFlow<Resource<String>>(Resource.Idle())
+    private val _paymentStatus =
+        MutableStateFlow<Resource<String>>(Resource.Idle())
+
     val paymentStatus: StateFlow<Resource<String>> = _paymentStatus
 
     fun fetchActiveOrders() {
         viewModelScope.launch {
             _orders.value = Resource.Loading()
+
             try {
                 val response = repository.getProcessOrders()
+
                 if (response.isSuccessful && response.body() != null) {
-                    _orders.value = Resource.Success(response.body()!!)
+                    _orders.value =
+                        Resource.Success(response.body()!!)
                 } else {
-                    _orders.value = Resource.Error("Failed to load orders")
+                    _orders.value =
+                        Resource.Error("Failed to load orders")
                 }
+
             } catch (e: Exception) {
-                _orders.value = Resource.Error("Network error: ${e.message}")
+                _orders.value =
+                    Resource.Error("Network error: ${e.message}")
             }
         }
     }
 
-    fun processPayment(orderId: String, method: String) {
+    fun processPayment(
+        orderId: String,
+        method: String
+    ) {
         viewModelScope.launch {
             _paymentStatus.value = Resource.Loading()
+
             try {
-                val response = repository.processPayment(orderId, method)
+                val response =
+                    repository.processPayment(orderId, method)
+
                 if (response.isSuccessful) {
-                    _paymentStatus.value = Resource.Success("Payment successful!")
-                    fetchActiveOrders() // Refresh the list automatically
+                    _paymentStatus.value =
+                        Resource.Success("Payment successful!")
+
+                    fetchActiveOrders()
                 } else {
-                    _paymentStatus.value = Resource.Error("Payment failed")
+                    _paymentStatus.value =
+                        Resource.Error("Payment failed")
                 }
+
             } catch (e: Exception) {
-                _paymentStatus.value = Resource.Error("Network error during payment")
+                _paymentStatus.value =
+                    Resource.Error("Network error during payment")
             }
         }
     }
