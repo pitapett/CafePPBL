@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.cafeapp.data.repository.UserPreferencesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -19,10 +20,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         viewModelScope.launch {
-            repository.deviceRole.collect { role ->
-                _startRole.value = role
-                _isLoading.value = false
-            }
+            repository.deviceRole
+                .catch {
+                    // If DataStore fails to read, fallback to a null role and proceed
+                    emit(null)
+                }
+                .collect { role ->
+                    _startRole.value = role
+                    _isLoading.value = false
+                }
         }
     }
 

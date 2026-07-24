@@ -32,10 +32,9 @@ class ManageStockViewModelTest {
         application = mockk(relaxed = true)
         repository = mockk()
 
-        viewModel = ManageStockViewModel(
-            application,
-            repository
-        )
+        viewModel = ManageStockViewModel(application)
+
+        viewModel.repository = repository
     }
 
     @Test
@@ -58,7 +57,8 @@ class ManageStockViewModelTest {
             viewModel.stockList.value is Resource.Error
         )
 
-        val result = viewModel.stockList.value as Resource.Error
+        val result =
+            viewModel.stockList.value as Resource.Error
 
         assertEquals(
             "Failed to load stock",

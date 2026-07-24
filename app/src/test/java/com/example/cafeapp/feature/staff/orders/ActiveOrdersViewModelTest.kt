@@ -29,14 +29,11 @@ class ActiveOrdersViewModelTest {
 
     @Before
     fun setup() {
-
         application = mockk(relaxed = true)
         repository = mockk()
 
-        viewModel = ActiveOrdersViewModel(
-            application,
-            repository
-        )
+        viewModel = ActiveOrdersViewModel(application)
+        viewModel.repository = repository
     }
 
     @Test
@@ -48,7 +45,9 @@ class ActiveOrdersViewModelTest {
         } returns Response.error(
             500,
             "Internal Server Error"
-                .toResponseBody("text/plain".toMediaType())
+                .toResponseBody(
+                    "text/plain".toMediaType()
+                )
         )
 
         // Act

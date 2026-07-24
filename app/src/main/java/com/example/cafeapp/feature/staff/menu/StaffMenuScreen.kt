@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -62,13 +63,12 @@ fun StaffMenuScreen(
                     onClick = onViewCartClicked,
                     icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "View Cart") },
                     text = {
-                        Text("View Cart ($cartItemCount) - $${String.format("%.2f", cartTotal)}")
+                        Text("View Cart ($cartItemCount) - Rp ${cartTotal.toInt()}")
                     }
                 )
             }
         }
     ) { paddingValues ->
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -78,6 +78,9 @@ fun StaffMenuScreen(
             contentPadding = PaddingValues(bottom = 88.dp, top = 8.dp)
         ) {
             items(menuItems) { item ->
+                // Calculate the specific quantity for this item from the active cart state
+                val cartQuantity = cartItems.find { it.menuId == item.id }?.quantity ?: 0
+
                 MenuItemCard(
                     item = item,
                     onAddClicked = { viewModel.addToCart(item) }

@@ -17,15 +17,22 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class StaffMenuViewModel(
-    application: Application,
-    private val repository: OrderRepository = OrderRepository(
+    application: Application
+) : AndroidViewModel(application) {
+
+    internal var repository: OrderRepository = OrderRepository(
         RetrofitClient.api,
         CafeDatabase.getDatabase(application).menuDao(),
         CafeDatabase.getDatabase(application).draftCartDao()
     )
-) : AndroidViewModel(application) {
 
     val menuState = repository.getMenuStream().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    val liveCart = repository.getLiveCartStream().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
@@ -37,24 +44,47 @@ class StaffMenuViewModel(
         }
     }
 
-    val liveCart = repository.getLiveCartStream().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
-
     fun addToCart(menuItem: MenuEntity) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.addToCart(menuItem)
         }
     }
 
-    private val _checkoutResult = MutableSharedFlow<Boolean>()
-    val checkoutResult = _checkoutResult.asSharedFlow()
+    fun decreaseFromCart(menuItem: MenuEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val existingItem =
+                liveCart.value.find {
+                    it.menuId == menuItem.id
+                }
+
+            if (existingItem != null) {
+                if (existingItem.quantity > 1) {
+                    val updatedItem = existingItem.copy(
+                        quantity = existingItem.quantity - 1
+                    )
+
+                    repository.updateCartItem(updatedItem)
+                } else {
+                    repository.deleteCartItem(existingItem)
+                }
+            }
+        }
+    }
+
+    private val _checkoutResult =
+        MutableSharedFlow<Boolean>()
+
+    val checkoutResult =
+        _checkoutResult.asSharedFlow()
 
     fun checkoutCart(tableNumber: String, staffId: String) {
         viewModelScope.launch {
-            val success = repository.processCheckout(tableNumber, staffId)
+            val success =
+                repository.processCheckout(
+                    tableNumber,
+                    staffId
+                )
+
             _checkoutResult.emit(success)
         }
     }

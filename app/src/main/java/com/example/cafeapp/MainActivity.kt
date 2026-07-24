@@ -7,6 +7,8 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -19,19 +21,27 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val isLoading by viewModel.isLoading.collectAsState()
-            val startRole by viewModel.startRole.collectAsState()
+            // Apply the default Material 3 Theme and Surface
+            MaterialTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    val isLoading by viewModel.isLoading.collectAsState()
+                    val startRole by viewModel.startRole.collectAsState()
 
-            if (isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                    if (isLoading) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                    } else {
+                        CafeAppNavigation(
+                            startRole = startRole,
+                            onRoleSelected = { role -> viewModel.saveRole(role) },
+                            onLogout = { viewModel.clearRole() }
+                        )
+                    }
                 }
-            } else {
-                CafeAppNavigation(
-                    startRole = startRole,
-                    onRoleSelected = { role -> viewModel.saveRole(role) },
-                    onLogout = { viewModel.clearRole() }
-                )
             }
         }
     }

@@ -17,9 +17,9 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import com.example.cafeapp.data.remote.CafeApiService
 
-class MenuViewModel(
-    private val api: CafeApiService = RetrofitClient.api
-) : ViewModel() {
+class MenuViewModel(val api: CafeApiService = RetrofitClient.api) : ViewModel() {
+
+//    private val api: CafeApiService = RetrofitClient.api
 
     // State untuk EditMenuScreen
     private val _menu = MutableStateFlow<MenuResponse?>(null)

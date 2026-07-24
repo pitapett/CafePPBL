@@ -26,38 +26,22 @@ class StaffMenuViewModelTest {
 
     @Before
     fun setup() {
-
         application = mockk(relaxed = true)
         repository = mockk()
 
-        // Dibutuhkan oleh menuState
-        every {
-            repository.getMenuStream()
-        } returns flowOf(emptyList())
-
-        // Dibutuhkan oleh liveCart
-        every {
-            repository.getLiveCartStream()
-        } returns flowOf(emptyList())
-
-        viewModel = StaffMenuViewModel(
-            application,
-            repository
-        )
+        viewModel = StaffMenuViewModel(application)
+        viewModel.repository = repository
     }
 
     @Test
     fun syncMenuWithServer_shouldSyncMenu() = runTest {
 
-        // Arrange
         coEvery {
             repository.syncMenu()
         } returns Unit
 
-        // Act
         viewModel.syncMenuWithServer()
 
-        // Assert
         coVerify(exactly = 1) {
             repository.syncMenu()
         }
