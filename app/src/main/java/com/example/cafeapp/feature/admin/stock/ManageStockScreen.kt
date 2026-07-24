@@ -158,7 +158,7 @@ private fun StockItemCard(item: StockResponse, onEditClicked: () -> Unit) {
 }
 
 @Composable
-private fun StockDialog(
+fun StockDialog(
     item: StockResponse?,
     onDismiss: () -> Unit,
     onSave: (String, Int, String) -> Unit,
