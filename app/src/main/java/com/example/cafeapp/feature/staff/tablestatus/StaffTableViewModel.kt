@@ -11,9 +11,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class StaffTableViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository = TableRepository(RetrofitClient.api)
+class StaffTableViewModel(
+    application: Application,
+    private val repository: TableRepository =
+        TableRepository(RetrofitClient.api)
+) : AndroidViewModel(application) {
 
     private val _tables = MutableStateFlow<Resource<List<TableResponse>>>(Resource.Idle())
     val tables: StateFlow<Resource<List<TableResponse>>> = _tables

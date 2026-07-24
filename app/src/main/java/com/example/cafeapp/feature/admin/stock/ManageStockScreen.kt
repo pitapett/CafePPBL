@@ -25,7 +25,6 @@ import com.example.cafeapp.utils.Resource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageStockScreen(
-    onNavigateToCreate: () -> Unit,
     viewModel: ManageStockViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -66,8 +65,12 @@ fun ManageStockScreen(
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = onNavigateToCreate) {
-                Icon(Icons.Default.Add, contentDescription = "Add Menu")
+            FloatingActionButton(onClick = {
+                selectedItem = null
+                showDialog = true
+            }
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Stock")
             }
         }
     ) { paddingValues ->

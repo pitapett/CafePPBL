@@ -47,24 +47,25 @@ android {
     }
 }
 
-
 dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-
     implementation(libs.androidx.constraintlayout)
 
-    // --- TESTING DEPENDENCIES ---
-    // Unit Test (app/src/test)
+    // --- LOCAL UNIT TEST (app/src/test) ---
     testImplementation(libs.junit)
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     testImplementation("androidx.arch.core:core-testing:2.2.0")
 
-    // UI Test / Instrumented Test (app/src/androidTest)
+    // --- INSTRUMENTED / UI TEST (app/src/androidTest) ---
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation("junit:junit:4.13.2") // 👈 PENTING: Bikin @Rule & @Test tidak merah
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.2") // 👈 PENTING: Untuk createComposeRule()
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.2")     // 👈 PENTING: Untuk setContent di UI Test
 
     // ⚠️ PERBAIKAN DI SINI: Ditambahkan versi :1.7.2
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.2")
@@ -81,6 +82,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
@@ -105,8 +107,7 @@ dependencies {
 
     implementation("androidx.compose.material:material-icons-extended:1.6.0")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
-    implementation("androidx.activity:activity-compose:1.9.0")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
 }
 
 configurations.all {
