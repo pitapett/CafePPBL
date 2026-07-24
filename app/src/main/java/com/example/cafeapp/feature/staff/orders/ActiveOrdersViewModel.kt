@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+// 1. Only 'application' stays in the constructor
 class ActiveOrdersViewModel(
     application: Application,
     private val repository: OrderRepository = OrderRepository(
@@ -20,6 +21,13 @@ class ActiveOrdersViewModel(
         CafeDatabase.getDatabase(application).draftCartDao()
     )
 ) : AndroidViewModel(application) {
+
+    // 2. Initialize the repository as a private variable inside the class
+//    private val repository: OrderRepository = OrderRepository(
+//        RetrofitClient.api,
+//        CafeDatabase.getDatabase(application).menuDao(),
+//        CafeDatabase.getDatabase(application).draftCartDao()
+//    )
 
     private val _orders = MutableStateFlow<Resource<List<ProcessOrderResponse>>>(Resource.Idle())
     val orders: StateFlow<Resource<List<ProcessOrderResponse>>> = _orders

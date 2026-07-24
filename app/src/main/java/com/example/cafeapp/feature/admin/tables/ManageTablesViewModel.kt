@@ -14,9 +14,11 @@ import kotlinx.coroutines.launch
 import retrofit2.Response
 
 class ManageTablesViewModel(
-    application: Application,
-    private val repository: TableRepository = TableRepository(RetrofitClient.api)
+    application: Application
+//    val repository: TableRepository = TableRepository(RetrofitClient.api)
 ) : AndroidViewModel(application) {
+
+    internal var repository: TableRepository = TableRepository(RetrofitClient.api)
 
     private val _tables = MutableStateFlow<Resource<List<TableResponse>>>(Resource.Idle())
     val tables: StateFlow<Resource<List<TableResponse>>> = _tables

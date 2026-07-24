@@ -31,17 +31,12 @@ class ManageTablesViewModelTest {
     fun setup() {
         application = mockk(relaxed = true)
         repository = mockk()
-
-        viewModel = ManageTablesViewModel(
-            application,
-            repository
-        )
+        viewModel = ManageTablesViewModel(application) // ✅ hanya satu parameter
+        viewModel.repository = repository              // ✅ inject mock
     }
 
     @Test
     fun fetchTables_whenApiFailed_shouldSetError() = runTest {
-
-        // Arrange
         coEvery {
             repository.getAllTables()
         } returns Response.error(
@@ -50,19 +45,10 @@ class ManageTablesViewModelTest {
                 .toResponseBody("text/plain".toMediaType())
         )
 
-        // Act
         viewModel.fetchTables()
 
-        // Assert
-        assertTrue(
-            viewModel.tables.value is Resource.Error
-        )
-
+        assertTrue(viewModel.tables.value is Resource.Error)
         val result = viewModel.tables.value as Resource.Error
-
-        assertEquals(
-            "Failed to fetch tables",
-            result.message
-        )
+        assertEquals("Failed to fetch tables", result.message)
     }
 }

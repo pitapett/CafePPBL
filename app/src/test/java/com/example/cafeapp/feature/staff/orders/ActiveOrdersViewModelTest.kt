@@ -29,14 +29,10 @@ class ActiveOrdersViewModelTest {
 
     @Before
     fun setup() {
-
         application = mockk(relaxed = true)
         repository = mockk()
 
-        viewModel = ActiveOrdersViewModel(
-            application,
-            repository
-        )
+        viewModel = ActiveOrdersViewModel(application, repository)
     }
 
     @Test

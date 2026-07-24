@@ -40,10 +40,7 @@ class StaffMenuViewModelTest {
             repository.getLiveCartStream()
         } returns flowOf(emptyList())
 
-        viewModel = StaffMenuViewModel(
-            application,
-            repository
-        )
+        viewModel = StaffMenuViewModel(application, repository)
     }
 
     @Test

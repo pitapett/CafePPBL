@@ -16,12 +16,18 @@ import kotlinx.coroutines.launch
 
 class CartDetailViewModel(
     application: Application,
-    private val repository: OrderRepository = OrderRepository(
+    val repository: OrderRepository = OrderRepository(
         RetrofitClient.api,
         CafeDatabase.getDatabase(application).menuDao(),
         CafeDatabase.getDatabase(application).draftCartDao()
     )
 ) : AndroidViewModel(application) {
+
+//    private val repository: OrderRepository = OrderRepository(
+//        RetrofitClient.api,
+//        CafeDatabase.getDatabase(application).menuDao(),
+//        CafeDatabase.getDatabase(application).draftCartDao()
+//    )
     val liveCartState = repository.getLiveCartStream().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
