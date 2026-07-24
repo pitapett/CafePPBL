@@ -27,37 +27,188 @@ class CartDetailViewModelTest {
 
     @Before
     fun setup() {
-
         application = mockk(relaxed = true)
-
         repository = mockk()
 
-        every {
-            repository.getLiveCartStream()
-        } returns flowOf(emptyList())
+        viewModel = CartDetailViewModel(application)
 
-        viewModel = CartDetailViewModel(
-            application,
-            repository
-        )
+        viewModel.repository = repository
     }
 
     @Test
-    fun removeItem_shouldDeleteItemFromCart() = runTest {
+    fun updateQuantity_increase_shouldUpdateCartItem() = runTest {
 
         // Arrange
-        val item = mockk<DraftCartEntity>()
+        val item = DraftCartEntity(
+            menuId = "1",
+            name = "Americano",
+            price = 20000.0,
+            quantity = 1,
+            customization = ""
+        )
 
         coEvery {
+            repository.updateCartItem(any())
+        } returns Unit
+
+        // Act
+        viewModel.updateQuantity(
+            item,
+            isIncrease = true
+        )
+
+        // Assert
+        coVerify(timeout = 1000, exactly = 1) {
+            repository.updateCartItem(
+                match {
+                    it.menuId == "1" &&
+                            it.quantity == 2
+                }
+            )
+        }
+    }
+
+    @Test
+    fun updateQuantity_decrease_whenQuantityGreaterThanOne_shouldUpdateCartItem() = runTest {
+
+        // Arrange
+        val item = DraftCartEntity(
+            menuId = "1",
+            name = "Americano",
+            price = 20000.0,
+            quantity = 1,
+            customization = ""
+        )
+
+        coEvery {
+            repository.updateCartItem(any())
+        } returns Unit
+
+        // Act
+        viewModel.updateQuantity(
+            item,
+            isIncrease = false
+        )
+
+        // Assert
+        coVerify(timeout = 1000, exactly = 1) {
+            repository.updateCartItem(
+                match {
+                    it.menuId == "1" &&
+                            it.quantity == 1
+                }
+            )
+        }
+    }
+
+    @Test
+    fun updateQuantity_decrease_whenQuantityIsOne_shouldDeleteCartItem() = runTest {
+
+        // Arrange
+        val item = DraftCartEntity(
+            menuId = "1",
+            name = "Americano",
+            price = 20000.0,
+            quantity = 1,
+            customization = ""
+        )
+
+        coEvery {
+            repository.deleteCartItem(any())
+        } returns Unit
+
+        // Act
+        viewModel.updateQuantity(
+            item,
+            isIncrease = false
+        )
+
+        // Assert
+        coVerify(timeout = 1000, exactly = 1) {
             repository.deleteCartItem(item)
+        }
+    }
+
+    @Test
+    fun updateCustomization_shouldUpdateCartItem() = runTest {
+
+        // Arrange
+        val item = DraftCartEntity(
+            menuId = "1",
+            name = "Americano",
+            price = 20000.0,
+            quantity = 1,
+            customization = ""
+        )
+
+        coEvery {
+            repository.updateCartItem(any())
+        } returns Unit
+
+        // Act
+        viewModel.updateCustomization(
+            item,
+            "Less sugar"
+        )
+
+        // Assert
+        coVerify(timeout = 1000, exactly = 1) {
+            repository.updateCartItem(
+                match {
+                    it.customization == "Less sugar"
+                }
+            )
+        }
+    }
+
+    @Test
+    fun removeItem_shouldDeleteCartItem() = runTest {
+
+        // Arrange
+        val item = DraftCartEntity(
+            menuId = "1",
+            name = "Americano",
+            price = 20000.0,
+            quantity = 1,
+            customization = ""
+        )
+
+        coEvery {
+            repository.deleteCartItem(any())
         } returns Unit
 
         // Act
         viewModel.removeItem(item)
 
         // Assert
-        coVerify(timeout = 1000) {
+        coVerify(timeout = 1000, exactly = 1) {
             repository.deleteCartItem(item)
+        }
+    }
+
+    @Test
+    fun checkoutCart_shouldProcessCheckout() = runTest {
+
+        // Arrange
+        coEvery {
+            repository.processCheckout(
+                "T1",
+                "staff1"
+            )
+        } returns true
+
+        // Act
+        viewModel.checkoutCart(
+            "T1",
+            "staff1"
+        )
+
+        // Assert
+        coVerify(exactly = 1) {
+            repository.processCheckout(
+                "T1",
+                "staff1"
+            )
         }
     }
 }

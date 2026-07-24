@@ -5,6 +5,7 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+<<<<<<< HEAD
       <SelectionState runConfigName="PaymentMethodDialogTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
@@ -28,6 +29,8 @@
       <SelectionState runConfigName="CheckoutBottomBarTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+=======
+>>>>>>> eb16ef24ca89f3dd7da50db8bb8acb528168e5da
     </selectionStates>
   </component>
 </project>

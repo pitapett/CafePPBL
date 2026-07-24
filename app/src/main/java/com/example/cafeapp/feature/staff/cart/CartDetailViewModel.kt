@@ -17,39 +17,60 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class CartDetailViewModel(
-    application: Application,
-    private val repository: OrderRepository = OrderRepository(
+    application: Application
+) : AndroidViewModel(application) {
+
+    internal var repository: OrderRepository = OrderRepository(
         RetrofitClient.api,
         CafeDatabase.getDatabase(application).menuDao(),
         CafeDatabase.getDatabase(application).draftCartDao()
     )
-) : AndroidViewModel(application) {
+
     val liveCartState = repository.getLiveCartStream().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
 
-    private val _checkoutResult = MutableSharedFlow<Boolean>()
-    val checkoutResult = _checkoutResult.asSharedFlow()
+    private val _checkoutResult =
+        MutableSharedFlow<Boolean>()
 
-    fun updateQuantity(item: DraftCartEntity, isIncrease: Boolean) {
+    val checkoutResult =
+        _checkoutResult.asSharedFlow()
+
+    fun updateQuantity(
+        item: DraftCartEntity,
+        isIncrease: Boolean
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
+
             if (isIncrease) {
                 val updatedItem = item.copy(quantity = item.quantity + 1)
                 repository.updateCartItem(updatedItem)
+
             } else {
+
                 if (item.quantity > 1) {
-                    val updatedItem = item.copy(quantity = item.quantity - 1)
+
+                    val updatedItem =
+                        item.copy(
+                            quantity = item.quantity - 1
+                        )
+
                     repository.updateCartItem(updatedItem)
+
                 } else {
+
                     repository.deleteCartItem(item)
                 }
             }
         }
     }
 
-    fun updateCustomization(item: DraftCartEntity, newNote: String) {
+    fun updateCustomization(
+        item: DraftCartEntity,
+        newNote: String
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             val updatedItem = item.copy(customization = newNote)
             repository.updateCartItem(updatedItem)
@@ -62,9 +83,18 @@ class CartDetailViewModel(
         }
     }
 
-    fun checkoutCart(tableNumber: String, staffId: String) {
+    fun checkoutCart(
+        tableNumber: String,
+        staffId: String
+    ) {
         viewModelScope.launch {
-            val success = repository.processCheckout(tableNumber, staffId)
+
+            val success =
+                repository.processCheckout(
+                    tableNumber,
+                    staffId
+                )
+
             _checkoutResult.emit(success)
         }
     }

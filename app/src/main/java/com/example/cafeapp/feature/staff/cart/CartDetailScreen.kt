@@ -68,7 +68,7 @@ fun CartDetailScreen(
                     isCheckingOut = isCheckingOut,
                     onCheckoutClicked = {
                         isCheckingOut = true
-                        viewModel.checkoutCart(tableNumber, staffId = "c7391d65-b34e-44b1-9db7-254fdf907458")
+                        viewModel.checkoutCart(tableNumber, staffId = "8c6f4079-3358-4341-afdc-f2e75398ddec")
                     }
                 )
             }
